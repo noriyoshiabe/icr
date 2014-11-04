@@ -4,6 +4,8 @@
   'use strict'
 
   var Peer = function Peer(id, signalingServer) {
+    Observable.apply(this)
+
     this.id = id
     this.signalingServer = signalingServer
 
@@ -11,15 +13,13 @@
     this._peer.onicecandidate = this._onIceCandidate.bind(this)
     this._peer.oniceconnectionstatechange = this._onIceConnectionStateChange.bind(this)
     this._peer.ondatachannel = this._setDataChannel.bind(this)
-
-    this._observers = []
   }
 
   Peer.ON_CONNECTED = "peer:on_connected"
   Peer.ON_DISCONNECTED = "peer:on_disconnected"
   Peer.ON_MESSAGE = "peer:on_message"
 
-  Peer.prototype = {
+  _.extend(Peer.prototype, Observable.prototype, {
     sendOffer: function() {
       this._setDataChannel(this._peer.createDataChannel('RTCDataChannel'))
 
@@ -106,25 +106,8 @@
 
     _onError: function(e) {
       console.log(e)
-    },
-
-    addObserver: function(observer) {
-      this._observers.push(observer)
-    },
-
-    removeObserver: function(observer) {
-      var index = this._observers.indexOf(observer)
-      if (-1 < index) {
-        this._observers.splice(index, 1)
-      }
-    },
-
-    _notify: function(type, data) {
-      for (var i = 0; i < this._observers.length; ++i) {
-        this._observers[i](this, {type: type, data: data})
-      }
     }
-  }
+  })
 
   return Peer
 });

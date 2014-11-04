@@ -4,17 +4,17 @@
   'use strict'
 
   var SignalingServer = function SignalingServer(id, severUrl) {
+    Observable.apply(this)
+
     this.id = id
     this.severUrl = severUrl
     this.peers = {}
-
-    this._observers = []
   }
 
   SignalingServer.ON_RECIVE_MESSAGE = 'signaling_server:on_receive_message'
   SignalingServer.ON_CREATE_PEER = 'signaling_server:on_create_peer'
 
-  SignalingServer.prototype = {
+  _.extend(SignalingServer.prototype, Observable.prototype, {
     connect: function(room_id) {
       this.room_id = room_id
 
@@ -70,25 +70,8 @@
 
     _onWebSocketClose: function(e) {
       console.log(e)
-    },
-
-    addObserver: function(observer) {
-      this._observers.push(observer)
-    },
-
-    removeObserver: function(observer) {
-      var index = this._observers.indexOf(observer)
-      if (-1 < index) {
-        this._observers.splice(index, 1)
-      }
-    },
-
-    _notify: function(type, data) {
-      for (var i = 0; i < this._observers.length; ++i) {
-        this._observers[i](this, {type: type, data: data})
-      }
     }
-  }
+  })
 
   return SignalingServer
 });

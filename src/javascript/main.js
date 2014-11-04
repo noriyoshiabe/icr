@@ -4,14 +4,16 @@ window.addEventListener('load', function() {
   var user_id = uuid.v4()
   var srv = new SignalingServer(user_id, location.origin.replace(/^http/, 'ws'))
 
-  srv.addObserver(function(ss, event) {
+  srv.addObserver(function(ss, event, data) {
     console.log(event)
-    if (event.type == SignalingServer.ON_CREATE_PEER) {
-      var peer = event.data
-      peer.addObserver(function(peer, event) {
+    if (event == SignalingServer.ON_CREATE_PEER) {
+      var peer = data
+      peer.addObserver(function(peer, event, data) {
         console.log(event)
-        if (event.type == Peer.ON_CONNECTED) {
+        if (event == Peer.ON_CONNECTED) {
           window._p = peer
+        } else if (event == Peer.ON_MESSAGE) {
+          console.log(data)
         }
       })
     }
