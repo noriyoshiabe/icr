@@ -8,20 +8,24 @@
   }
 
   Observable.prototype = {
-    addObserver: function(observer) {
-      this._observers.push(observer)
+    addObserver: function(observer, func) {
+      this._observers.push({observer: observer, func: func})
     },
 
     removeObserver: function(observer) {
-      var index = this._observers.indexOf(observer)
-      if (-1 < index) {
-        this._observers.splice(index, 1)
+      var willRemoved = _.where(this._observers, {observer: observer})
+      for (var i = 0; i < willRemoved.length; ++i) {
+        var index = this._observers.indexOf(willRemoved[i])
+        if (-1 < index) {
+          this._observers.splice(index, 1)
+        }
       }
     },
 
     _notify: function(event, data) {
       for (var i = 0; i < this._observers.length; ++i) {
-        this._observers[i](this, event, data)
+        var elem = this._observers[i]
+        elem.func.bind(elem.observer)(this, event, data)
       }
     }
   }
@@ -83,7 +87,7 @@
   Collection.UPDATED = 'collection:updated'
   Collection.REMOVED = 'collection:removed'
 
-  Collection.prototype = {
+  _.extend(Collection.prototype, Observable.prototype, {
     model: Model,
 
     add: function(objects) {
@@ -97,7 +101,7 @@
           this._byId[attrs.id].set(attrs)
         } else {
           var model = attrs instanceof this.model ? attrs : new this.model(attrs)
-          model.addObserver(this._onModelChanged.bind(this))
+          model.addObserver(this, this._onModelChanged)
           this.models.push(model)
           this._byId[model.id] = model
           this._notify(Collection.ADDED, model)
@@ -137,6 +141,15 @@
       return this.models[index]
     },
 
+    clear: function() {
+      for (var i = 0; i < this.models.length; ++i) {
+        this._notify(Collection.REMOVED, this.models[i])
+      }
+
+      this.models = []
+      this._byId = {}
+    },
+
     toJSON: function() {
       return JSON.stringify(_.map(this.models, function (m) { m.attributes() }))
     },
@@ -144,7 +157,7 @@
     _onModelChanged: function(model) {
       this._notify(Collection.UPDATED, model)
     }
-  }
+  })
 
   return Collection
 });

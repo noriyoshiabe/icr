@@ -47,7 +47,7 @@
       case 'enter':
         var peer = new Peer(message.from, this)
         peer.sendOffer()
-        peer.addObserver(this._onNotifyPeerEvent.bind(this))
+        peer.addObserver(this, this._onNotifyPeerEvent)
         this.peers[message.from] = peer
         this._notify(SignalingServer.ON_CREATE_PEER, peer)
         break
@@ -55,7 +55,7 @@
       case 'offer':
         var peer = new Peer(message.from, this)
         peer.sendAnswer(message.description)
-        peer.addObserver(this._onNotifyPeerEvent.bind(this))
+        peer.addObserver(this, this._onNotifyPeerEvent)
         this.peers[message.from] = peer
         this._notify(SignalingServer.ON_CREATE_PEER, peer)
         break
