@@ -45,7 +45,6 @@
       if (this._peer.iceConnectionState != "closed") {
         this._peer.close()
       }
-      this._notify(Peer.ON_DISCONNECTED)
     },
 
     send: function(data) {
@@ -83,6 +82,7 @@
 
       dataChannel.onclose = function(e) {
         this.close()
+        this._notify(Peer.ON_DISCONNECTED)
       }.bind(this)
 
       dataChannel.onerror = this._onError

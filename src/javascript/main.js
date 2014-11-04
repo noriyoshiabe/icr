@@ -5,6 +5,7 @@ window.addEventListener('load', function() {
   var srv = new SignalingServer(user_id, location.origin.replace(/^http/, 'ws'))
 
   srv.addObserver(function(ss, event, data) {
+    window._s = ss
     console.log(event)
     if (event == SignalingServer.ON_CREATE_PEER) {
       var peer = data

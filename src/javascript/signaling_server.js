@@ -11,8 +11,8 @@
     this.peers = {}
   }
 
-  SignalingServer.ON_RECIVE_MESSAGE = 'signaling_server:on_receive_message'
   SignalingServer.ON_CREATE_PEER = 'signaling_server:on_create_peer'
+  SignalingServer.ON_REMOVE_PEER = 'signaling_server:on_remove_peer'
 
   _.extend(SignalingServer.prototype, Observable.prototype, {
     connect: function(room_id) {
@@ -29,6 +29,7 @@
       for (var key in this.peers) {
         this.peers[key].close()
       }
+      this._socket.close()
     },
 
     send: function(peer, data) {
@@ -46,6 +47,7 @@
       case 'enter':
         var peer = new Peer(message.from, this)
         peer.sendOffer()
+        peer.addObserver(this._onNotifyPeerEvent.bind(this))
         this.peers[message.from] = peer
         this._notify(SignalingServer.ON_CREATE_PEER, peer)
         break
@@ -53,6 +55,7 @@
       case 'offer':
         var peer = new Peer(message.from, this)
         peer.sendAnswer(message.description)
+        peer.addObserver(this._onNotifyPeerEvent.bind(this))
         this.peers[message.from] = peer
         this._notify(SignalingServer.ON_CREATE_PEER, peer)
         break
@@ -70,6 +73,13 @@
 
     _onWebSocketClose: function(e) {
       console.log(e)
+    },
+
+    _onNotifyPeerEvent: function(peer, event, data) {
+      if (Peer.ON_DISCONNECTED == event) {
+        delete this.peers[peer.id]
+        this._notify(SignalingServer.ON_REMOVE_PEER, peer)
+      }
     }
   })
 
