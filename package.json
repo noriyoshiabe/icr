@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "dependencies": {
     "express": "^4.10.1",
-    "grunt-cli": "^0.1.13"
+    "grunt-cli": "^0.1.13",
+    "ws": "^0.4.32"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
