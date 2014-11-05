@@ -29,9 +29,12 @@
     },
 
     _onNotifyPeerEvent: function(peer, event, message) {
+      console.log(event)
       switch (event) {
         case Peer.ON_CONNECTED:
           this.send('auth:request')
+          break
+        case Peer.ON_DISCONNECTED:
           break
         case Peer.ON_MESSAGE:
           this._onMessage(JSON.parse(message))

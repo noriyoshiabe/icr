@@ -41,10 +41,16 @@
     },
 
     _onNotifySignalingServerEvent: function(srv, event, data) {
-      if (SignalingServer.ON_CREATE_PEER == event) {
-        var peer = data
-        var user = new User({id: peer.id, peer: peer})
-        user.addObserver(this, this._onNotifyUserEvent)
+      switch (event) {
+        case SignalingServer.ON_CREATE_PEER:
+          var peer = data
+          var user = new User({id: peer.id, peer: peer})
+          user.addObserver(this, this._onNotifyUserEvent)
+          break
+        case SignalingServer.ON_REMOVE_PEER:
+          var peer = data
+          this.users.removeWhere({id: peer.id})
+          break
       }
     },
 

@@ -144,7 +144,11 @@
       return added
     },
 
-    remove: function(where) {
+    remove: function(model) {
+      this.removeWhere({id: model.id})
+    },
+
+    removeWhere: function(where) {
       var removed = _.where(this.models, where)
 
       for (var i = 0; i < removed.length; ++i) {
