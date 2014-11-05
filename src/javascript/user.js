@@ -17,7 +17,7 @@
   User.MESSAGE = 'user:message'
 
   _.extend(User.prototype, Model.prototype, {
-    properties: ['id', 'name', 'image_url'],
+    properties: ['id', 'name', 'image_url', 'signature'],
 
     send: function(type, data) {
       var message = {type: type, data: data}
@@ -31,8 +31,7 @@
     _onNotifyPeerEvent: function(peer, event, message) {
       switch (event) {
         case Peer.ON_CONNECTED:
-          // TODO verify, etc
-          this._notify(User.AUTHENTICATE_SECCESS)
+          this.send('auth:request')
           break
         case Peer.ON_MESSAGE:
           this._onMessage(JSON.parse(message))
@@ -42,6 +41,28 @@
 
     _onMessage: function(message) {
       switch (message.type) {
+        case 'auth:request':
+          var signature = CryptoJS.SHA1(this.peer.id + app.cert.secret).toString(CryptoJS.enc.Hex)
+          this.send('auth:result', signature)
+          break
+
+        case 'auth:result':
+          this.find(function(user) {
+            this.set(user)
+            if (this.signature) {
+              if (this.signature == message.data) {
+                this._notify(User.AUTHENTICATE_SECCESS)
+              } else {
+                this._notify(User.AUTHENTICATE_FAILED)
+              }
+            } else {
+              this.signature = message.data
+              this.save()
+              this._notify(User.AUTHENTICATE_SECCESS)
+            }
+          }.bind(this))
+          break
+
         case 'message':
           this._notify(User.MESSAGE, message.data)
           break
