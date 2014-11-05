@@ -58,12 +58,20 @@
       var scope = this._db.transaction([query.store]).objectStore(query.store)
           scope = query.index ? scope.index(query.index) : scope
 
-      scope.openCursor(range).onsuccess = function(e) {
+      var desc = query.last ? true : false
+      var limit = query.first || query.last
+
+      scope.openCursor(range, desc ? "prev" : "next").onsuccess = function(e) {
         var cursor = e.target.result
         if (cursor) {
-          results.push(cursor.value)
+          if (query.last) {
+            results.unshift(cursor.value)
+          } else {
+            results.push(cursor.value)
+          }
+
           ++count
-          if (!query.limit || count < query.limit) {
+          if (!limit || count < limit) {
             cursor.continue()
           } else {
             this._onFinishSelect(query, results, callback)

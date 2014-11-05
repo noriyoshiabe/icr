@@ -24,23 +24,29 @@
         this.db = db
         window.db = db
 
-        this.readSettings()
+        this._readSettings()
       }
     },
 
-    readSettings: function() {
+    _readSettings: function() {
       this.cert = new Certificate({id: 'user_cert'})
       this.cert.find(function(cert) {
         cert.user_id = cert.user_id || uuid.v4()
         cert.secret = cert.secret || uuid.v4()
         cert.save()
 
-        this.roomEnter()
+        this._loadUser()
+      }.bind(this))
+    },
+
+    _loadUser: function() {
+      this.user = new User({id: this.cert.user_id})
+      this.user.find(function(user) {
+        this.roomEnter() //TODO UIから
       }.bind(this))
     },
 
     roomEnter: function () {
-
       var room_id = location.hash.match(/^#.*/) ? location.hash.substring(1) : uuid.v4()
 
       this.room = new Room({id: room_id})
@@ -48,7 +54,6 @@
         console.log(data)
       })
 
-      this.user = new User({id: this.cert.user_id})
       this.room.enter(this.user)
 
       location.hash = room_id

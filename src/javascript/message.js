@@ -14,9 +14,8 @@
   })
 
   Message.schemeDefinition = function(db) {
-    var store = db.createObjectStore("messages", {keyPath: "created_at"})
-    store.createIndex("id", "id", {unique: true});
-    store.createIndex("room_id", "room_id", {unique: false});
+    var store = db.createObjectStore("messages", {keyPath: "id"})
+    store.createIndex("room_id_and_created_at", ["room_id", "created_at"], {unique: false})
   }
 
   Message.create = function(room_id, sender_id, message) {
@@ -38,12 +37,16 @@
   'use strict'
 
   var Messages = function Messages(objects) {
-    Collection.apply(this, objects)
+    Collection.apply(this, arguments)
   }
 
   _.extend(Messages.prototype, Collection.prototype, {
     model: Message
   })
+
+  Messages.select = function(query, callback) {
+    new Messages().select(query, callback)
+  }
 
   return Messages
 });

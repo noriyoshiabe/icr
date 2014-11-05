@@ -10,11 +10,14 @@
       this.peer = attributes.peer
       this.peer.addObserver(this, this._onNotifyPeerEvent)
     }
+
+    this.online = false
   }
 
   User.AUTHENTICATE_SECCESS = 'user:authenticate_seccess'
   User.AUTHENTICATE_FAILED = 'user:authenticate_failed'
   User.MESSAGE = 'user:message'
+  User.ON_MESSAGE = 'user:on_message'
 
   _.extend(User.prototype, Model.prototype, {
     properties: ['id', 'name', 'image_url', 'signature'],
@@ -29,12 +32,13 @@
     },
 
     _onNotifyPeerEvent: function(peer, event, message) {
-      console.log(event)
       switch (event) {
         case Peer.ON_CONNECTED:
           this.send('auth:request')
+          this.online = true
           break
         case Peer.ON_DISCONNECTED:
+          this.online = false
           break
         case Peer.ON_MESSAGE:
           this._onMessage(JSON.parse(message))
@@ -70,6 +74,8 @@
           this._notify(User.MESSAGE, message.data)
           break
       }
+
+      this._notify(User.ON_MESSAGE, message)
     },
 
     storeName: "users"

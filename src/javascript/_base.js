@@ -123,7 +123,7 @@
     model: Model,
 
     add: function(objects) {
-      objects = _.isArray(objects) ? objects : [objects]
+      objects = objects instanceof this.constructor ? objects.models : _.isArray(objects) ? objects : [objects]
 
       var added = []
 

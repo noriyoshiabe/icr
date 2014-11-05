@@ -11,6 +11,8 @@
     this.peers = {}
   }
 
+  SignalingServer.ON_CONNECTED = 'signaling_server:on_connected'
+  SignalingServer.ON_DISCONNECTED = 'signaling_server:on_disconnected'
   SignalingServer.ON_CREATE_PEER = 'signaling_server:on_create_peer'
   SignalingServer.ON_REMOVE_PEER = 'signaling_server:on_remove_peer'
 
@@ -39,6 +41,7 @@
 
     _onWebSocketOpen: function(e) {
       this.send(null, {type: 'enter', room_id: this.room_id})
+      this._notify(SignalingServer.ON_CONNECTED)
     },
 
     _onWebSocketMessage: function(e) {
@@ -73,6 +76,7 @@
 
     _onWebSocketClose: function(e) {
       console.log(e)
+      this._notify(SignalingServer.ON_DISCONNECTED)
     },
 
     _onNotifyPeerEvent: function(peer, event, data) {
