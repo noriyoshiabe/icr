@@ -46,8 +46,14 @@
           this._notify(User.MESSAGE, message.data)
           break
       }
-    }
+    },
+
+    storeName: "users"
   })
+
+  User.schemeDefinition = function(db) {
+    db.createObjectStore("users", {keyPath: "id"})
+  }
 
   return User
 });

@@ -25,6 +25,7 @@
       this.srv.connect(this.id)
 
       this.entered_at = new Date().getTime()
+      this.save()
     },
 
     leave: function() {
@@ -52,17 +53,26 @@
         case User.AUTHENTICATE_SECCESS:
           this.users.add(user)
           this._notify(Room.USER_ADDED, user)
+          this.users.save()
           break
         case User.AUTHENTICATE_FAILED:
           user.peer.close()
           user.removeObserver(this)
           break
         case User.MESSAGE:
-          this.messages.add(data)
+          var message = new Message(data)
+          this.messages.add(message)
+          message.save()
           break
       }
-    }
+    },
+
+    storeName: "rooms"
   })
+
+  Room.schemeDefinition = function(db) {
+    db.createObjectStore("rooms", {keyPath: "id"})
+  }
 
   return Room
 });

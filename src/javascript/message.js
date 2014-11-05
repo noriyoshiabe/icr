@@ -8,8 +8,16 @@
   }
 
   _.extend(Message.prototype, Model.prototype, {
-    properties: ['id', 'room_id', 'sender_id', 'message', 'created_at']
+    properties: ['id', 'room_id', 'sender_id', 'message', 'created_at'],
+
+    storeName: "messages"
   })
+
+  Message.schemeDefinition = function(db) {
+    var store = db.createObjectStore("messages", {keyPath: "created_at"})
+    store.createIndex("id", "id", {unique: true});
+    store.createIndex("room_id", "room_id", {unique: false});
+  }
 
   Message.create = function(room_id, sender_id, message) {
     return {

@@ -1,4 +1,20 @@
 (function(definition) {
+  Base = definition()
+})(function() {
+  'use strict'
+
+  var Base = function Base() {}
+
+  Base.prototype = {
+    getDB: function() {
+      return Base.db
+    }
+  }
+
+  return Base
+});
+
+(function(definition) {
   Observable = definition()
 })(function() {
   'use strict'
@@ -46,7 +62,7 @@
 
   Model.CHANGED = 'model:changed'
 
-  _.extend(Model.prototype, Observable.prototype, {
+  _.extend(Model.prototype, Observable.prototype, Base.prototype, {
     properties: ['id'],
 
     attributes: function() {
@@ -62,6 +78,22 @@
     toJSON: function() {
       return JSON.stringify(this.attributes())
     },
+
+    key: function() {
+      return 'id'
+    },
+
+    find: function(callback) {
+      var query = {key: this[this.key()], store: this.storeName}
+      this.getDB().find(query, function(result) {
+        this.set(result)
+        callback(this)
+      }.bind(this))
+    },
+
+    save: function() {
+      this.getDB().save(this.storeName, this.attributes())
+    }
   })
 
 
@@ -87,7 +119,7 @@
   Collection.UPDATED = 'collection:updated'
   Collection.REMOVED = 'collection:removed'
 
-  _.extend(Collection.prototype, Observable.prototype, {
+  _.extend(Collection.prototype, Observable.prototype, Base.prototype, {
     model: Model,
 
     add: function(objects) {
@@ -141,6 +173,10 @@
       return this.models[index]
     },
 
+    findWhere: function(where) {
+      return _.findWhere(this.models, where)
+    },
+
     clear: function() {
       for (var i = 0; i < this.models.length; ++i) {
         this._notify(Collection.REMOVED, this.models[i])
@@ -150,8 +186,28 @@
       this._byId = {}
     },
 
+    attributes: function() {
+      return _.map(this.models, function (m) { return m.attributes() })
+    },
+
     toJSON: function() {
-      return JSON.stringify(_.map(this.models, function (m) { m.attributes() }))
+      return JSON.stringify(this.attributes())
+    },
+
+    save: function() {
+      this.getDB().save(this.model.prototype.storeName, this.attributes())
+    },
+
+    select: function(query, callback) {
+      query.store = this.model.prototype.storeName
+      this.getDB().select(query, function(results) {
+        this.add(results)
+        callback(this)
+      }.bind(this))
+    },
+
+    selectAll: function(callback) {
+      this.select({}, callback)
     },
 
     _onModelChanged: function(model) {
