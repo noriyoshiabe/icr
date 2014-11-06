@@ -98,6 +98,9 @@
     },
 
     _onIceConnectionStateChange: function(e) {
+      if (this._peer.iceConnectionState == "disconnected") {
+        this._notify(Peer.ON_DISCONNECTED)
+      }
     },
 
     _onFailure: function(e) {
