@@ -136,7 +136,9 @@
           model.addObserver(this, this._onModelChanged)
 
           if (this.order) {
-            var index = _.sortedIndex(this.models, model, this.order)
+            var index = _.sortedIndex(this.models, model, function (m) {
+              return this.desc ? -m[this.order] : m[this.order]
+            }.bind(this))
             this.models.splice(index, 0, model)
           } else{
             this.models.push(model)

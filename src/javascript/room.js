@@ -233,7 +233,8 @@
   })
 
   Room.schemeDefinition = function(db) {
-    db.createObjectStore("rooms", {keyPath: "id"})
+    var store = db.createObjectStore("rooms", {keyPath: "id"})
+    store.createIndex("entered_at", "entered_at", {unique: false})
   }
 
   return Room
@@ -250,6 +251,9 @@
 
   _.extend(Rooms.prototype, Collection.prototype, {
     model: Room,
+
+    order: 'entered_at',
+    desc: true
   })
 
   return Rooms

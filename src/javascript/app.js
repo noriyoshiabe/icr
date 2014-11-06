@@ -47,6 +47,13 @@
         cert.secret = cert.secret || uuid.v4()
         cert.save()
 
+        this._loadRooms()
+      }.bind(this))
+    },
+
+    _loadRooms: function() {
+      this.rooms = new Rooms
+      this.rooms.select({index: "entered_at", last: 5}, function(rooms) {
         this._loadUser()
       }.bind(this))
     },
