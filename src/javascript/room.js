@@ -32,6 +32,10 @@
       this._broadcast('sync:notify:room', _.omit(this.attributes(), 'entered_at'))
     },
 
+    notifyUserUpdate: function() {
+      this._broadcast('sync:notify:user', _.omit(this.user.attributes(), 'signature'))
+    },
+
     _readMessage: function() {
       var query = {index: "room_id_and_created_at", lower: [this.id], upper:[this.id, ''], last: LIMIT}
       this.messages.select(query, function(messages) {
@@ -69,11 +73,14 @@
     },
 
     _broadcast: function(type, data) {
-      this.users.models.forEach(function(user) {
-        if (user != this.user) {
-          user.send(type, data)
-        }
-      }.bind(this))
+      var message = JSON.stringify({type: type, data: data})
+      _.each(this.users.models, function(user) {
+        _.each(user.peers, function(peer) {
+          if (peer instanceof Peer) {
+            peer.send(message)
+          }
+        })
+      })
     },
 
     _onNotifySignalingServerEvent: function(srv, event, data) {
@@ -128,12 +135,6 @@
 
         case User.ON_DISCONNECTED:
           this.users.remove(user)
-          break
-
-        case Model.CHANGED:
-          if (user == this.user) {
-            this._broadcast('sync:notify:user', _.omit(this.user.attributes(), 'signature'))
-          }
           break
       }
     },

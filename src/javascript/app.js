@@ -81,6 +81,9 @@
     userProfile: function(name, image_url) {
       this.user.set({name: name, image_url: image_url})
       this.user.save()
+      if (this.room) {
+        this.room.notifyUserUpdate()
+      }
     },
 
     enterRoom: function(room_id) {
@@ -103,6 +106,7 @@
 
       this.room.removeObserver(this)
       this.room.leave()
+      this.room = null
       this._changeState(App.STATE_FRONT)
 
       location.replace("")

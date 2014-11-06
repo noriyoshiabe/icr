@@ -22,9 +22,9 @@
     properties: ['id', 'name', 'image_url', 'signature'],
 
     send: function(type, data) {
-      var message = {type: type, data: data}
+      var message = JSON.stringify({type: type, data: data})
       this.peers.forEach(function(peer) {
-        peer.send(JSON.stringify(message))
+        peer.send(message)
       })
     },
 
