@@ -74,29 +74,13 @@
           if (!limit || count < limit) {
             cursor.continue()
           } else {
-            this._onFinishSelect(query, results, callback)
+            callback(results)
           }
         }
         else {
-          this._onFinishSelect(query, results, callback)
+          callback(results)
         }
       }.bind(this)
-    },
-
-    _onFinishSelect: function(query, results, callback) {
-      if (query.in) {
-        results = _.filter(function(attrs) {
-          return _.contains(query.in.keys, attrs[query.in.keyPath])
-        })
-      }
-
-      if (query.not_in) {
-        results = _.reject(function(attrs) {
-          return _.contains(query.not_in.keys, attrs[query.not_in.keyPath])
-        })
-      }
-
-      callback(results)
     },
 
     deleteAll: function() {
