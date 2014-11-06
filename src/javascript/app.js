@@ -4,8 +4,20 @@
   'use strict'
 
   var App = function App() {
+    Observable.apply(this)
+
     window.app = this
+    this.state = App.STATE_INIT
   }
+
+  App.STATE_INIT = 'app:state_init'
+  App.STATE_FRONT = 'app:state_front'
+  App.STATE_ENTERING_ROOM = 'app:state_entering_room'
+  App.STATE_ROOM_ENTERED = 'app:state_room_entered'
+
+  App.READY = 'app:ready'
+  App.CHANGE_STATE = 'app:change_state'
+  App.USERNAME_REQUIRED = 'app:username_required'
 
   _.extend(App.prototype, Observable.prototype, {
     start: function() {
@@ -42,21 +54,47 @@
     _loadUser: function() {
       this.user = new User({id: this.cert.user_id})
       this.user.find(function(user) {
-        this.roomEnter() //TODO UIから
+        this._notify(App.READY)
+
+        if (location.hash.match(/^#.*/)) {
+          if (user.name) {
+            this.roomEnter(location.hash.substring(1))
+          } else {
+            this._changeState(App.STATE_FRONT)
+            this._notify(App.USERNAME_REQUIRED)
+          }
+        } else {
+          this._changeState(App.STATE_FRONT)
+        }
       }.bind(this))
     },
 
-    roomEnter: function () {
-      var room_id = location.hash.match(/^#.*/) ? location.hash.substring(1) : uuid.v4()
+    userProfile: function(name, image_url) {
+      this.user.set({name: name, image_url: image_url})
+      this.user.save()
+    },
+
+    roomEnter: function(room_id) {
+      this._changeState(App.STATE_ENTERING_ROOM)
+
+      room_id = room_id || uuid.v4()
 
       this.room = new Room({id: room_id})
-      this.room.messages.addObserver(this, function(messages, event, data) {
-        console.log(data)
-      })
+      this.room.addObserver(this, function(room, event, data) {
+        if (Room.ENTERD == event) {
+          this._changeState(App.STATE_ROOM_ENTERED)
+          this.room.removeObserver(this)
+        }
+      }.bind(this))
 
       this.room.enter(this.user)
 
       location.hash = room_id
+    },
+
+    _changeState: function(state) {
+      this.state = state
+      this._notify(App.CHANGE_STATE, state)
     }
   })
 

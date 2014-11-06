@@ -13,6 +13,7 @@
   }
 
   Room.USER_ADDED = 'room:user_added'
+  Room.ENTERD = 'room:enterd'
 
   _.extend(Room.prototype, Model.prototype, {
     properties: ['id', 'name', 'named_at', 'entered_at'],
@@ -23,6 +24,12 @@
       this.users.add(this.user)
 
       this._readMessage()
+    },
+
+    roomName: function(name) {
+      this.set({name: name, named_at: new Date().getTime()})
+      this.save()
+      this._broadcast('sync:notify:room', _.omit(this.attributes(), 'entered_at'))
     },
 
     _readMessage: function() {
@@ -39,11 +46,13 @@
     },
 
     _finishEnter: function() {
-      this.entered_at = new Date().getTime()
+      this.set({entered_at: new Date().getTime()})
       this.save()
+      this._notify(Room.ENTERD)
     },
 
     leave: function() {
+      this.user.removeObserver(this)
       this.srv.disconnect()
       this.users.clear()
       this.messages.clear()
@@ -54,6 +63,14 @@
       _.each(this.users.models, function(u) {
         u.send('message', data)
       })
+    },
+
+    _broadcast: function(type, data) {
+      this.users.models.forEach(function(user) {
+        if (user != this.user) {
+          user.send(type, data)
+        }
+      }.bind(this))
     },
 
     _onNotifySignalingServerEvent: function(srv, event, data) {
@@ -82,7 +99,9 @@
           this.users.add(user)
           this._notify(Room.USER_ADDED, user)
           this.users.save()
-          this._sync(user)
+          this._syncUser(user)
+          this._syncRoom(user)
+          this._syncMessage(user)
           break
         case User.AUTHENTICATE_FAILED:
           user.peer.close()
@@ -96,10 +115,23 @@
         case User.ON_MESSAGE:
           this._onMessage(user, data)
           break
+        case Model.CHANGED:
+          if (user == this.user) {
+            this._broadcast('sync:notify:user', _.omit(this.user.attributes(), 'signature'))
+          }
+          break
       }
     },
 
-    _sync: function(user) {
+    _syncUser: function(user) {
+      user.send('sync:query:user')
+    },
+
+    _syncRoom: function(user) {
+      user.send('sync:query:room')
+    },
+
+    _syncMessage: function(user) {
       var to = new Date().getTime()
       var syncQuery = {to: to}
       var query = {index: "room_id_and_created_at", upper: to}
@@ -140,9 +172,7 @@
           limit: LIMIT
         }
 
-        this.users.models.forEach(function(user) {
-          user.send('sync:query:message', syncQuery)
-        })
+        this._broadcast('sync:query:message', syncQuery)
       }.bind(this))
     },
 
@@ -173,6 +203,28 @@
           var messages = new Messages(unknownMessages)
           messages.save()
           this.messages.add(messages)
+          break
+
+        case 'sync:query:user':
+          user.send('sync:result:user', _.omit(this.user.attributes(), 'signature'))
+          break
+
+        case 'sync:result:user':
+        case 'sync:notify:user':
+          user.set(message.data)
+          user.save()
+          break
+
+        case 'sync:query:room':
+          user.send('sync:result:room', _.omit(this.attributes(), 'entered_at'))
+          break
+
+        case 'sync:result:room':
+        case 'sync:notify:room':
+          if (!this.named_at || this.named_at < message.data.named_at) {
+            this.set(message.data)
+            this.save()
+          }
           break
       }
     },

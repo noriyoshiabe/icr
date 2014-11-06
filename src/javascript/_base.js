@@ -221,8 +221,10 @@
       this.select({}, callback)
     },
 
-    _onModelChanged: function(model) {
-      this._notify(Collection.UPDATED, model)
+    _onModelChanged: function(model, event) {
+      if (Model.CHANGED == event) {
+        this._notify(Collection.UPDATED, model)
+      }
     }
   })
 
