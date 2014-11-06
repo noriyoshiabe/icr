@@ -3,10 +3,10 @@
 })(function() {
   'use strict'
 
-  var SignalingServer = function SignalingServer(id, severUrl) {
+  var SignalingServer = function SignalingServer(severUrl) {
     Observable.apply(this)
 
-    this.id = id
+    this.id = uuid.v4()
     this.severUrl = severUrl
     this.peers = {}
   }

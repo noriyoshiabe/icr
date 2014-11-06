@@ -40,7 +40,7 @@
     },
 
     _connectServer: function() {
-      this.srv = new SignalingServer(this.user.id, location.origin.replace(/^http/, 'ws'))
+      this.srv = new SignalingServer(location.origin.replace(/^http/, 'ws'))
       this.srv.addObserver(this, this._onNotifySignalingServerEvent)
       this.srv.connect(this.id)
     },
@@ -81,17 +81,17 @@
         case SignalingServer.ON_CONNECTED:
           this._finishEnter()
           break
+
         case SignalingServer.ON_DISCONNECTED:
-          // TODO
           break
+
         case SignalingServer.ON_CREATE_PEER:
           var peer = data
-          var user = new User({id: peer.id, peer: peer})
+          var user = new User({peer: peer})
           user.addObserver(this, this._onNotifyUserEvent)
           break
+
         case SignalingServer.ON_REMOVE_PEER:
-          var peer = data
-          this.users.removeWhere({id: peer.id})
           break
       }
     },
@@ -99,25 +99,37 @@
     _onNotifyUserEvent: function(user, event, data) {
       switch (event) {
         case User.AUTHENTICATE_SECCESS:
-          this.users.add(user)
+          user.save()
+          if (this.users.contain(user)) {
+            this.users.byId(user.id).extend(user)
+          } else {
+            this.users.add(user)
+          }
+
           this._notify(Room.USER_ADDED, user)
-          this.users.save()
           this._syncUser(user)
           this._syncRoom(user)
           this._syncMessage(user)
           break
+
         case User.AUTHENTICATE_FAILED:
-          user.peer.close()
           user.removeObserver(this)
           break
+
         case User.MESSAGE:
           var message = new Message(data)
           this.messages.add(message)
           message.save()
           break
+
         case User.ON_MESSAGE:
           this._onMessage(user, data)
           break
+
+        case User.ON_DISCONNECTED:
+          this.users.remove(user)
+          break
+
         case Model.CHANGED:
           if (user == this.user) {
             this._broadcast('sync:notify:user', _.omit(this.user.attributes(), 'signature'))
