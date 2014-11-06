@@ -13,7 +13,7 @@
   }
 
   Room.USER_ADDED = 'room:user_added'
-  Room.ENTERD = 'room:enterd'
+  Room.ENTERED = 'room:entered'
 
   _.extend(Room.prototype, Model.prototype, {
     properties: ['id', 'name', 'named_at', 'entered_at'],
@@ -48,7 +48,7 @@
     _finishEnter: function() {
       this.set({entered_at: new Date().getTime()})
       this.save()
-      this._notify(Room.ENTERD)
+      this._notify(Room.ENTERED)
     },
 
     leave: function() {
@@ -198,7 +198,7 @@
 
         case 'sync:result:message':
           var unknownMessages = _.filter(message.data, function(m) {
-            return !this.messages.byId(m.id)
+            return !this.messages.contain(m)
           }.bind(this))
           var messages = new Messages(unknownMessages)
           messages.save()

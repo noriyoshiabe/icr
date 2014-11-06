@@ -170,6 +170,10 @@
       return removed
     },
 
+    contain: function(model) {
+      return !!this._byId[model.id]
+    },
+
     byId: function(id) {
       return this._byId[id]
     },

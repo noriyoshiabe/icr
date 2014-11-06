@@ -19,6 +19,8 @@
   App.CHANGE_STATE = 'app:change_state'
   App.USERNAME_REQUIRED = 'app:username_required'
 
+  var RECENT_ROOMS = 5
+
   _.extend(App.prototype, Observable.prototype, {
     start: function() {
       var db = new DB('icr', 1)
@@ -53,7 +55,7 @@
 
     _loadRooms: function() {
       this.rooms = new Rooms
-      this.rooms.select({index: "entered_at", last: 5}, function(rooms) {
+      this.rooms.select({index: "entered_at", last: RECENT_ROOMS}, function(rooms) {
         this._loadUser()
       }.bind(this))
     },
@@ -87,16 +89,19 @@
       room_id = room_id || uuid.v4()
 
       this.room = new Room({id: room_id})
-      this.room.addObserver(this, function(room, event, data) {
-        if (Room.ENTERD == event) {
-          this._changeState(App.STATE_ROOM_ENTERED)
-          this.room.removeObserver(this)
-        }
-      }.bind(this))
-
+      this.room.addObserver(this, this._onNotifyRoomEvent)
       this.room.enter(this.user)
 
       location.hash = room_id
+    },
+
+    _onNotifyRoomEvent: function(room, event, data) {
+      if (Room.ENTERED == event) {
+        this._changeState(App.STATE_ROOM_ENTERED)
+        room.removeObserver(this)
+        this.rooms.remove(room)
+        this.rooms.add(room)
+      }
     },
 
     _changeState: function(state) {
