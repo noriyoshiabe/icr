@@ -82,7 +82,7 @@
           this.users.add(user)
           this._notify(Room.USER_ADDED, user)
           this.users.save()
-          this._startSync(user)
+          this._sync(user)
           break
         case User.AUTHENTICATE_FAILED:
           user.peer.close()
@@ -99,56 +99,80 @@
       }
     },
 
-    _startSync: function(user) {
-      this.synchronizingQ = this.synchronizingQ || []
+    _sync: function(user) {
+      var to = new Date().getTime()
+      var syncQuery = {to: to}
+      var query = {index: "room_id_and_created_at", upper: to}
 
-      if (this.synchronizing) {
-        this.synchronizingQ.push(user)
+      var first = _.first(this.messages.models)
+      if (first) {
+        syncQuery.from = first.created_at
+        syncQuery.not_in_ids = this.messages.ids()
+        user.send('sync:query:message', syncQuery)
       } else {
-        this.synchronizing = user
-        this._sync(user)
+        syncQuery.limit = LIMIT
+        syncQuery.not_in_ids = []
+        user.send('sync:query:message', syncQuery)
       }
     },
 
-    _sync: function(user) {
-      var syncQuery = {}
-      
-      var last = _.last(this.messages.models)
-      var ids = _.pluck(_.last(this.messages.models, LIMIT), 'id')
-      syncQuery.newest = last ? last.created_at : new Date().getTime()
-      syncQuery.limit = LIMIT
-      syncQuery.hash = CryptoJS.SHA1(ids.join('')).toString(CryptoJS.enc.Hex)
+    loadPrev: function() {
+      var first = _.first(this.messages.models)
+      if (!first) {
+        return
+      }
 
-      user.send('sync:query', syncQuery)
+      var before = first.created_at - 1
+
+      var query = {
+        index: "room_id_and_created_at",
+        lower: [this.id, 0],
+        upper: [this.id, before],
+        last: LIMIT
+      }
+
+      Messages.select(query, function(messages) {
+        this.messages.add(messages)
+
+        var syncQuery = {
+          to: before,
+          not_in_ids: messages.ids(),
+          limit: LIMIT
+        }
+
+        this.users.models.forEach(function(user) {
+          user.send('sync:query:message', syncQuery)
+        })
+      }.bind(this))
     },
 
     _onMessage: function(user, message) {
       switch (message.type) {
-        case 'sync:query':
+        case 'sync:query:message':
           var syncQuery = message.data
-          var query = {index: "room_id_and_created_at", lower: [this.id, syncQuery.newest + 1], upper: [this.id, ''], first: LIMIT}
+
+          var query = {
+            index: "room_id_and_created_at",
+            lower: [this.id, syncQuery.from ? syncQuery.from : 0],
+            upper: [this.id, syncQuery.to],
+            last: syncQuery.limit ? syncQuery.limit : null
+          }
+
           Messages.select(query, function(messages) {
-            var result = messages
-            var query = {index: "room_id_and_created_at", lower: [this.id], upper: [this.id, syncQuery.newest], last: LIMIT}
-            Messages.select(query, function(messages) {
-              var ids = messages.ids()
-              var hash = CryptoJS.SHA1(ids.join('')).toString(CryptoJS.enc.Hex)
-              if (hash != syncQuery.hash) {
-                result.add(messages)
-              }
-              user.send('sync:result', result.attributes())
-            }.bind(this))
-          }.bind(this))
+            var results = _.reject(messages.attributes(), function(attrs) {
+              return _.contains(syncQuery.not_in_ids, attrs.id)
+            })
+            user.send('sync:result:message', results)
+          })
           break
-        case 'sync:result':
-          var messages = new Messages(_.filter(message.data, function(m) { return !this.messages.byId(m.id) }.bind(this)))
+
+        case 'sync:result:message':
+          var unknownMessages = _.filter(message.data, function(m) {
+            return !this.messages.byId(m.id)
+          }.bind(this))
+          var messages = new Messages(unknownMessages)
           messages.save()
           this.messages.add(messages)
-
-          this.synchronizing = this.synchronizingQ.shift()
-          if (this.synchronizing) {
-            this._sync(this.synchronizing)
-          }
           break
       }
     },

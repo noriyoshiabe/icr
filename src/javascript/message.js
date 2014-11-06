@@ -41,7 +41,8 @@
   }
 
   _.extend(Messages.prototype, Collection.prototype, {
-    model: Message
+    model: Message,
+    order: 'created_at'
   })
 
   Messages.select = function(query, callback) {

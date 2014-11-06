@@ -134,7 +134,14 @@
         } else {
           var model = attrs instanceof this.model ? attrs : new this.model(attrs)
           model.addObserver(this, this._onModelChanged)
-          this.models.push(model)
+
+          if (this.order) {
+            var index = _.sortedIndex(this.models, model, this.order)
+            this.models.splice(index, 0, model)
+          } else{
+            this.models.push(model)
+          }
+
           this._byId[model.id] = model
           this._notify(Collection.ADDED, model)
           added.push(model)
