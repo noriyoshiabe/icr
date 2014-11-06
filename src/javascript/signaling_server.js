@@ -75,7 +75,6 @@
     },
 
     _onWebSocketClose: function(e) {
-      console.log(e)
       this._notify(SignalingServer.ON_DISCONNECTED)
     },
 

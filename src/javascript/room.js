@@ -52,7 +52,10 @@
     },
 
     leave: function() {
-      this.user.removeObserver(this)
+      this.users.models.forEach(function(user) {
+        user.removeObserver(this)
+      }.bind(this))
+      this.srv.removeObserver(this)
       this.srv.disconnect()
       this.users.clear()
       this.messages.clear()

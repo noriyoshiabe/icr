@@ -67,7 +67,7 @@
 
         if (location.hash.match(/^#.*/)) {
           if (user.name) {
-            this.roomEnter(location.hash.substring(1))
+            this.enterRoom(location.hash.substring(1))
           } else {
             this._changeState(App.STATE_FRONT)
             this._notify(App.USERNAME_REQUIRED)
@@ -83,7 +83,7 @@
       this.user.save()
     },
 
-    roomEnter: function(room_id) {
+    enterRoom: function(room_id) {
       this._changeState(App.STATE_ENTERING_ROOM)
 
       room_id = room_id || uuid.v4()
@@ -92,13 +92,39 @@
       this.room.addObserver(this, this._onNotifyRoomEvent)
       this.room.enter(this.user)
 
-      location.hash = room_id
+      location.replace("#" + room_id)
+    },
+
+    leaveRoom: function() {
+      if (App.STATE_ROOM_ENTERED != this.state) {
+        console.warn('leaveRoom() illegal state: ' + this.state)
+        return
+      }
+
+      this.room.removeObserver(this)
+      this.room.leave()
+      this._changeState(App.STATE_FRONT)
+
+      location.replace("")
+    },
+
+    switchRoom: function(room_id) {
+      if (App.STATE_ROOM_ENTERED != this.state) {
+        console.warn('leaveRoom() illegal state: ' + this.state)
+        return
+      }
+
+      this.room.removeObserver(this)
+      this.room.leave()
+      this._changeState(App.STATE_FRONT)
+      this.enterRoom(room_id)
+
+      location.replace("#" + room_id)
     },
 
     _onNotifyRoomEvent: function(room, event, data) {
       if (Room.ENTERED == event) {
         this._changeState(App.STATE_ROOM_ENTERED)
-        room.removeObserver(this)
         this.rooms.remove(room)
         this.rooms.add(room)
       }
