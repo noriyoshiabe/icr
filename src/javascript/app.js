@@ -92,10 +92,11 @@
       room_id = room_id || uuid.v4()
 
       this.room = new Room({id: room_id})
-      this.room.addObserver(this, this._onNotifyRoomEvent)
-      this.room.enter(this.user)
-
-      location.replace("#" + room_id)
+      this.room.find(function(room) {
+        this.room.addObserver(this, this._onNotifyRoomEvent)
+        this.room.enter(this.user)
+        location.replace("#" + room_id)
+      }.bind(this))
     },
 
     leaveRoom: function() {
@@ -131,6 +132,12 @@
         this._changeState(App.STATE_ROOM_ENTERED)
         this.rooms.remove(room)
         this.rooms.add(room)
+        if (RECENT_ROOMS < this.rooms.size()) {
+          var willRemove = _.last(this.rooms.models, this.rooms.size() - RECENT_ROOMS)
+          _.each(willRemove, function(room) {
+            this.rooms.remove(room)
+          }.bind(this))
+        }
       }
     },
 

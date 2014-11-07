@@ -203,6 +203,10 @@
       this._byId = {}
     },
 
+    each: function(iteratee, context) {
+      _.each(this.models, iteratee, context)
+    },
+
     attributes: function() {
       return _.map(this.models, function (m) { return m.attributes() })
     },

@@ -70,7 +70,6 @@
           var result = message.data
           this.id = result.user_id
           this.find(function(user) {
-            this.set(user)
             if (this.signature) {
               if (this.signature == result.signature) {
                 this._notify(User.AUTHENTICATE_SECCESS)

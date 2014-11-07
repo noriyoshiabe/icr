@@ -21,6 +21,11 @@ window.addEventListener('load', function() {
       console.log(app.rooms)
       console.log(app.room.messages)
     }
+
+    if (App.READY == event) {
+      var frontView = new FrontView(app)
+      frontView.render()
+    }
   })
 
   app.start()

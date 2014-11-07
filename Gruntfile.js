@@ -16,6 +16,10 @@ module.exports = function (grunt) {
       css: {
         tasks: ['concat:css'],
         files: ['src/stylesheet/**/*.css']
+      },
+      image: {
+        tasks: ['copy:image'],
+        files: ['src/images/**/*.png']
       }
     },
 
@@ -26,6 +30,16 @@ module.exports = function (grunt) {
             expand: true,
             cwd: 'src/',
             src: '**/*.html',
+            dest: 'public/'
+          }
+        ]
+      },
+      image: {
+        files: [
+          {
+            expand: true,
+            cwd: 'src/',
+            src: '**/*.png',
             dest: 'public/'
           }
         ]
