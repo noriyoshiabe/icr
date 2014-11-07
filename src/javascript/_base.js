@@ -162,7 +162,7 @@
 
       for (var i = 0; i < removed.length; ++i) {
         var target = removed[i]
-        this.models.splice(this.models.indexOf(target))
+        this.models.splice(this.models.indexOf(target), 1)
         delete this._byId[target.id]
         this._notify(Collection.REMOVED, target)
       }
