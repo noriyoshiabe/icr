@@ -3,28 +3,21 @@ console.log('Hello!!')
 window.addEventListener('load', function() {
 
   var app = new App()
+  var content = document.querySelector('.js-content')
+  var currentView = null
 
   app.addObserver(this, function(app, event, data) {
     console.log(event + (data ? ' : ' + data : ''))
 
     if (App.CHANGE_STATE == event && data == App.STATE_ROOM_ENTERED) {
-      app.room.addObserver(this, function (room, event, data) {
-        console.log(event)
-      })
-      app.room.users.addObserver(this, function (users, event, data) {
-        console.log(event)
-      })
-      app.room.messages.addObserver(this, function (messages, event, data) {
-        console.log(event)
-      })
-
-      console.log(app.rooms)
-      console.log(app.room.messages)
+      content.removeChild(currentView.el)
+      currentView = new RoomView(content, app)
+      content.appendChild(currentView.el)
     }
 
     if (App.READY == event) {
-      var frontView = new FrontView(app)
-      frontView.render()
+      currentView = new FrontView(content, app)
+      content.appendChild(currentView.el)
     }
   })
 

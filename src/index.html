@@ -11,28 +11,84 @@
       <h2>INSTANT CHAT ROOM</h2>
     </a>
     <div class="header__user js-header-user">
-      <img class="header__user-avatar js-avatar" src="/images/default.png" alt="anonymous" width="20" height="20">
-      <p class="header__user-name js-name">anonymous</p>
+      <img class="js-avatar" src="/images/default.png" width="20" height="20">
+      <p class="js-name">anonymous</p>
     </div>
   </header>
-  <div class="content">
-    <div id="front">
-      <h4>Create Room</h4>
-      <form id="create-room">
-        <label for="name">Room Name</label>
-        <input name="name" type="text">
-        <input type="submit" value="Create">
-      </form>
-      <h4>Recents</h4>
-      <ul class="recent-room-list js-recent-rooms">
-        <template id="recent-room-list-item">
-          <li><button class="js-button"></button></li>
-        </template>
-      </ul>
+  <div class="content js-content">
+    <template id="front">
+      <div class="front">
+        <h4>Create Room</h4>
+        <form id="create-room">
+          <label for="name">Room Name</label>
+          <input name="name" type="text">
+          <input type="submit" value="Create">
+        </form>
 
-      <h4>Development</h4>
-      <button class="js-clear-db">Clear DB</button>
-    </div>
+        <h4>Recents</h4>
+        <ul class="recent-room-list js-recent-room-list">
+          <template id="recent-room-list-item">
+            <li>
+              <button class="js-button"></button>
+            </li>
+          </template>
+        </ul>
+
+        <h4>Development</h4>
+        <button class="js-clear-db">Clear DB</button>
+      </div>
+    </template>
+
+    <template id="room">
+      <div class="room">
+        <div class="messages-container">
+          <ul class="js-message-list">
+            <template id="message-list-item">
+              <li class="message">
+                <img class="message__avatar js-avatar" width="24" height="24">
+                <p class="message__username js-username"></p>
+                <p class="message__date js-date"></p>
+                <p class="message__body js-body"></p>
+              </li>
+            </template>
+          </ul>
+        </div>
+
+        <form id="message-form" class="message-form">
+          <input name="message" type="text">
+        </form>
+
+        <div class="side-menu">
+          <div class="side-menu__room-name">
+            <h2 class="js-room-name"></h2>
+            <button class="js-room-name-change">Change</button>
+          </div>
+          
+          <div class="side-menu__members">
+            <h4>Members</h4>
+            <ul class="js-member-list">
+              <template id="member-list-item">
+                <li>
+                  <img class="js-avatar" src="/images/default.png" alt="anonymous" width="20" height="20">
+                  <p class="js-username">anonymous</p>
+                </li>
+              </template>
+            </ul>
+          </div>
+
+          <div class="side-menu__rooms">
+            <h4>Rooms</h4>
+            <ul class="js-room-list">
+              <template id="room-list-item">
+                <li>
+                  <button class="js-button"></button>
+                </li>
+              </template>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </template>
   </div>
 </body>
 </html>

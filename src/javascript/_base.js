@@ -207,6 +207,10 @@
       _.each(this.models, iteratee, context)
     },
 
+    indexOf: function(model) {
+      return _.indexOf(this.models, model)
+    },
+
     attributes: function() {
       return _.map(this.models, function (m) { return m.attributes() })
     },
