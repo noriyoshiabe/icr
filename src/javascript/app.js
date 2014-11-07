@@ -33,6 +33,7 @@
 
     _onNotifyDBEvent: function(db, event) {
       if (DB.OPENED == event) {
+        this.db = db
         this._readCertificate()
       }
     },
@@ -68,12 +69,7 @@
         this._notify(App.READY)
 
         if (location.hash.match(/^#.*/)) {
-          if (user.name) {
-            this.enterRoom(location.hash.substring(1))
-          } else {
-            this._changeState(App.STATE_FRONT)
-            this._notify(App.USERNAME_REQUIRED)
-          }
+          this.enterRoom(location.hash.substring(1))
         } else {
           this._changeState(App.STATE_FRONT)
         }
@@ -88,13 +84,23 @@
       }
     },
 
-    enterRoom: function(room_id) {
+    enterRoom: function(room_id, roomName) {
       this._changeState(App.STATE_ENTERING_ROOM)
+
+      if (!this.user.name) {
+        this._notify(App.USERNAME_REQUIRED, room_id)
+        return
+      }
 
       room_id = room_id || uuid.v4()
 
       this.room = new Room({id: room_id}, this.cert)
       this.room.find(function(room) {
+        if (roomName) {
+          this.room.set({name: roomName})
+          this.room.save()
+        }
+
         this.room.addObserver(this, this._onNotifyRoomEvent)
         this.room.enter(this.user)
         history.pushState('', document.title, '#' + room_id)
@@ -127,6 +133,12 @@
       this.enterRoom(room_id)
 
       history.pushState('', document.title, '#' + room_id)
+    },
+
+    clearDB: function() {
+      this._changeState(App.STATE_INIT)
+      this.db.deleteAll()
+      this.start()
     },
 
     _onNotifyRoomEvent: function(room, event, data) {

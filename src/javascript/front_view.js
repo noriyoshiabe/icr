@@ -24,7 +24,7 @@
 
     this.app.rooms.each(function(room) {
       var listItem = new RecentRoomListItem(this.recentRoomList, room)
-      listItem.button.addEventListener('click', this._onClickRecentRoom.bind(this), false)
+      listItem.addObserver(this, this._onNotifyRecentRoomListItemEvent)
       this.recentRoomList.appendChild(listItem.el)
       this.recentRoomListItems.push(listItem)
     }.bind(this))
@@ -37,7 +37,10 @@
   _.extend(FrontView.prototype, Observable.prototype, {
     _onSubmitCreateRoom: function(e) {
       e.preventDefault()
-      this._notify(FrontView.SUBMIT_CREATE_ROOM, e.target.elements["name"].value)
+      var roomName = e.target.elements["name"].value
+      if (0 < roomName.length) {
+        this._notify(FrontView.SUBMIT_CREATE_ROOM, roomName)
+      }
     },
 
     _onClickRecentRoom: function(e) {
@@ -46,6 +49,13 @@
 
     _onClickClearDB: function(e) {
       this._notify(FrontView.CLICK_CLEAR_DB)
+    },
+
+    _onNotifyRecentRoomListItemEvent: function(listItem, event, data) {
+      this._notify(event, data)
+    },
+
+    destroy: function() {
     }
   })
 
@@ -60,14 +70,22 @@
   var template = null
 
   var RecentRoomListItem = function RecentRoomListItem(container, room) {
+    Observable.apply(this)
+
     template = template || container.querySelector('#recent-room-list-item')
 
     this.room = room
     this.el = document.importNode(template.content, true).firstElementChild
     this.button = this.el.querySelector('.js-button')
     this.button.textContent = room.name ? room.name : room.id
-    this.button.view = this
+    this.button.addEventListener('click', this._onClickButton.bind(this), false)
   }
+
+  _.extend(RecentRoomListItem.prototype, Observable.prototype, {
+    _onClickButton: function(e) {
+      this._notify(FrontView.CLICK_RECENT_ROOM, this.room)
+    }
+  })
 
   return RecentRoomListItem
 });
