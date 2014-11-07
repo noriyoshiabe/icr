@@ -7,7 +7,7 @@
 
   Base.prototype = {
     getDB: function() {
-      return Base.db
+      return DB.instance
     }
   }
 

@@ -3,6 +3,7 @@ console.log('Hello!!')
 window.addEventListener('load', function() {
 
   var app = new App()
+  window._app = app
   var content = document.querySelector('.js-content')
   var currentView = null
 

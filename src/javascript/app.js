@@ -6,7 +6,6 @@
   var App = function App() {
     Observable.apply(this)
 
-    window.app = this
     this.state = App.STATE_INIT
   }
 
@@ -34,15 +33,11 @@
 
     _onNotifyDBEvent: function(db, event) {
       if (DB.OPENED == event) {
-        Base.db = db
-        this.db = db
-        window.db = db
-
-        this._readSettings()
+        this._readCertificate()
       }
     },
 
-    _readSettings: function() {
+    _readCertificate: function() {
       this.cert = new Certificate({id: 'user_cert'})
       this.cert.find(function(cert) {
         cert.user_id = cert.user_id || uuid.v4()
@@ -98,7 +93,7 @@
 
       room_id = room_id || uuid.v4()
 
-      this.room = new Room({id: room_id})
+      this.room = new Room({id: room_id}, this.cert)
       this.room.find(function(room) {
         this.room.addObserver(this, this._onNotifyRoomEvent)
         this.room.enter(this.user)

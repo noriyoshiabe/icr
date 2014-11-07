@@ -110,6 +110,8 @@
     _onDBOpenSuccess: function(e) {
       this._db = e.target.result
       this._db.onerror = this._onError
+
+      DB.instance = this
       this._notify(DB.OPENED)
     },
 

@@ -3,9 +3,10 @@
 })(function() {
   'use strict'
 
-  var User = function User(attributes) {
+  var User = function User(attributes, cert) {
     Model.apply(this, arguments)
 
+    this.cert = cert
     this.peers = []
     var peer = attributes.peer ? attributes.peer : new FakePeer()
     peer.addObserver(this, this._onNotifyPeerEvent)
@@ -39,7 +40,7 @@
     _onNotifyPeerEvent: function(peer, event, message) {
       switch (event) {
         case Peer.ON_CONNECTED:
-          this.send('auth:request', app.cert.user_id)
+          this.send('auth:request', this.cert.user_id)
           break
 
         case Peer.ON_DISCONNECTED:
@@ -62,8 +63,8 @@
       switch (message.type) {
         case 'auth:request':
           var remote_user_id = message.data
-          var signature = CryptoJS.SHA1(remote_user_id + app.cert.secret).toString(CryptoJS.enc.Hex)
-          this.send('auth:result', {user_id: app.cert.user_id, signature: signature})
+          var signature = CryptoJS.SHA1(remote_user_id + this.cert.secret).toString(CryptoJS.enc.Hex)
+          this.send('auth:result', {user_id: this.cert.user_id, signature: signature})
           break
 
         case 'auth:result':

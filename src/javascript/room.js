@@ -5,9 +5,10 @@
 
   var LIMIT = 50
 
-  var Room = function Room(attributes) {
+  var Room = function Room(attributes, cert) {
     Model.apply(this, arguments)
 
+    this.cert = cert
     this.users = new Users
     this.messages = new Messages
   }
@@ -94,7 +95,7 @@
 
         case SignalingServer.ON_CREATE_PEER:
           var peer = data
-          var user = new User({peer: peer})
+          var user = new User({peer: peer}, this.cert)
           user.addObserver(this, this._onNotifyUserEvent)
           break
 
