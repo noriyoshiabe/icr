@@ -102,7 +102,7 @@
       this.room.find(function(room) {
         this.room.addObserver(this, this._onNotifyRoomEvent)
         this.room.enter(this.user)
-        location.replace("#" + room_id)
+        history.pushState('', document.title, '#' + room_id)
       }.bind(this))
     },
 
@@ -117,7 +117,7 @@
       this.room = null
       this._changeState(App.STATE_FRONT)
 
-      location.replace("")
+      history.pushState('', document.title, '/')
     },
 
     switchRoom: function(room_id) {
@@ -131,7 +131,7 @@
       this._changeState(App.STATE_FRONT)
       this.enterRoom(room_id)
 
-      location.replace("#" + room_id)
+      history.pushState('', document.title, '#' + room_id)
     },
 
     _onNotifyRoomEvent: function(room, event, data) {
