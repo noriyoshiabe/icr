@@ -80,6 +80,24 @@
         case FrontView.CLICK_CLEAR_DB:
           this.app.clearDB()
           break
+
+        case RoomView.SUBMIT_MESSAGE:
+          var message = data
+          this.app.room.sendMessage(message)
+          break
+
+        case RoomView.CLICK_ROOM_NAME_CHANGE:
+          var roomName = ''
+          while (!roomName || !roomName.length) {
+            roomName = prompt("Please enter room name.")
+          }
+          this.app.room.roomName(roomName)
+          break
+
+        case RoomView.CLICK_ROOM:
+          var room = data
+          this.app.switchRoom(room.id)
+          break
       }
     }
   }

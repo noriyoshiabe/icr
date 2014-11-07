@@ -62,7 +62,7 @@
 
     this.rooms.each(function(room) {
       var listItem = this._renderListItem(this.roomList, -1, room)
-      listItem.button.addEventListener('click', this._onClickRoom.bind(this), false)
+      listItem.addObserver(this, this._onNotifyRoomListItemEvent)
     }.bind(this))
   }
 
@@ -140,7 +140,7 @@
       switch (event) {
         case Collection.ADDED:
           var listItem = this._renderListItem(this.roomList, rooms.indexOf(room), room)
-          listItem.button.addEventListener('click', this._onClickRoom.bind(this), false)
+          listItem.addObserver(this, this._onNotifyRoomListItemEvent)
           break
 
         case Collection.REMOVED:
@@ -164,8 +164,8 @@
       this._notify(RoomView.CLICK_ROOM_NAME_CHANGE)
     },
 
-    _onClickRoom: function(e) {
-      this._notify(RoomView.CLICK_ROOM, e.target.view.room)
+    _onNotifyRoomListItemEvent: function(listItem, event, data) {
+      this._notify(event, data)
     },
 
     destroy: function() {
@@ -290,13 +290,15 @@
   var template = null
 
   var RoomListItem = function RoomListItem(container, room) {
+    Observable.apply(this)
+
     template = template || container.querySelector('#room-list-item')
 
     this.id = room.id
 
     this.el = document.importNode(template.content, true).firstElementChild
     this.button = this.el.querySelector('.js-button')
-    this.button.view = this
+    this.button.addEventListener('click', this._onClickRoom.bind(this), false)
 
     this.room = room
     this.room.addObserver(this, this._onNotifyRoomEvent)
@@ -304,9 +306,13 @@
     this._render()
   }
 
-  RoomListItem.prototype = {
+  _.extend(RoomListItem.prototype, Observable.prototype, {
     _render: function() {
       this.button.textContent = this.room.name ? this.room.name : this.room.id
+    },
+
+    _onClickRoom: function(e) {
+      this._notify(RoomView.CLICK_ROOM, this.room)
     },
 
     _onNotifyRoomEvent: function(user, event) {
@@ -318,7 +324,7 @@
     destroy: function() {
       this.room.removeObserver(this)
     }
-  }
+  })
 
   return RoomListItem
 });
