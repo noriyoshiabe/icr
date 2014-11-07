@@ -11,7 +11,9 @@
     template = template || container.querySelector('#room')
 
     this.room = app.room
-    this.users = app.room.users // TODO
+    this.messages = app.room.messages
+    this.users = app.users
+    this.roomUsers = app.room.users
     this.rooms = app.rooms
 
     this.el = document.importNode(template.content, true).firstElementChild
@@ -42,19 +44,19 @@
     this.roomNameChange = this.el.querySelector('.js-room-name-change')
     this.roomNameChange.addEventListener('click', this._onClickRoomNameChange.bind(this), false)
 
-    this.room.messages.addObserver(this, this._onNotifyMessagesEvent)
     this.room.addObserver(this, this._onNotifyCurrentRoomEvent)
+    this.messages.addObserver(this, this._onNotifyMessagesEvent)
     this.users.addObserver(this, this._onNotifyUsersEvent)
-    this.room.users.addObserver(this, this._onNotifyRoomUsersEvent)
+    this.roomUsers.addObserver(this, this._onNotifyRoomUsersEvent)
     this.rooms.addObserver(this, this._onNotifyRoomsEvent)
 
     this._renderRoomName()
 
-    this.room.messages.each(function(message) {
+    this.messages.each(function(message) {
       this._renderListItem(this.messageList, -1, message, this.users)
     }.bind(this))
 
-    this.room.users.each(function(user) {
+    this.roomUsers.each(function(user) {
       this._renderListItem(this.memberList, -1, user)
     }.bind(this))
 
@@ -98,7 +100,7 @@
     _onNotifyMessagesEvent: function(messages, event, message) {
       switch (event) {
         case Collection.ADDED:
-          this._renderListItem(this.messageList, messages.indexOf(message), message, this.app)
+          this._renderListItem(this.messageList, messages.indexOf(message), message, this.users)
           break
       }
     },
@@ -167,9 +169,10 @@
     },
 
     destroy: function() {
-      this.room.messages.removeObserver(this)
+      this.room.removeObserver(this)
+      this.messages.removeObserver(this)
       this.users.removeObserver(this)
-      this.room.users.removeObserver(this)
+      this.roomUsers.removeObserver(this)
       this.rooms.removeObserver(this)
     }
   })

@@ -56,6 +56,13 @@
     _loadRooms: function() {
       this.rooms = new Rooms
       this.rooms.select({index: "entered_at", last: RECENT_ROOMS}, function(rooms) {
+        this._loadUsers()
+      }.bind(this))
+    },
+
+    _loadUsers: function() {
+      this.users = new Users
+      this.users.selectAll(function(users) {
         this._loadUser()
       }.bind(this))
     },
@@ -128,16 +135,24 @@
     },
 
     _onNotifyRoomEvent: function(room, event, data) {
-      if (Room.ENTERED == event) {
-        this._changeState(App.STATE_ROOM_ENTERED)
-        this.rooms.remove(room)
-        this.rooms.add(room)
-        if (RECENT_ROOMS < this.rooms.size()) {
-          var willRemove = _.last(this.rooms.models, this.rooms.size() - RECENT_ROOMS)
-          _.each(willRemove, function(room) {
-            this.rooms.remove(room)
-          }.bind(this))
-        }
+      switch (event) {
+        case Room.ENTERED:
+          this._changeState(App.STATE_ROOM_ENTERED)
+          this.rooms.remove(room)
+          this.rooms.add(room)
+          if (RECENT_ROOMS < this.rooms.size()) {
+            var willRemove = _.last(this.rooms.models, this.rooms.size() - RECENT_ROOMS)
+            _.each(willRemove, function(room) {
+              this.rooms.remove(room)
+            }.bind(this))
+          }
+          break
+
+        case Room.USER_ADDED:
+          var user = data
+          this.users.remove(user)
+          this.users.add(user)
+          break
       }
     },
 
