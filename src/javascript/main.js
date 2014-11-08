@@ -112,11 +112,7 @@
           break
 
         case RoomView.CLICK_ROOM_NAME_CHANGE:
-          var roomName = ''
-          while (!roomName || !roomName.length) {
-            roomName = prompt("Please enter room name.")
-          }
-          this.app.room.roomName(roomName)
+          this._showModal(new RoomNameDialog())
           break
 
         case RoomView.CLICK_ROOM:
@@ -133,6 +129,12 @@
           var roomInfo = data2
           this.app.userProfile(username)
           this.app.enterRoom(roomInfo.id, roomInfo.name)
+          this._dismissModal()
+          break
+
+        case RoomNameDialog.SUBMIT:
+          var roomName = data1
+          this.app.room.roomName(roomName)
           this._dismissModal()
           break
 
