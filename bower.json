@@ -6,7 +6,8 @@
     "underscore.string": "~2.3.3",
     "jquery": "~2.1.1",
     "node-uuid": "~1.4.1",
-    "crypto-js": "http://crypto-js.googlecode.com/files/CryptoJS%20v3.1.2.zip"
+    "crypto-js": "http://crypto-js.googlecode.com/files/CryptoJS%20v3.1.2.zip",
+    "HTML5-Reset": "~2.1.2"
   },
   "exportsOverride": {
     "underscore.string": {
@@ -19,6 +20,11 @@
       "./": [
         "**/core.js",
         "**/sha1.js"
+      ]
+    },
+    "HTML5-Reset": {
+      "./": [
+        "**/reset.css"
       ]
     }
   }

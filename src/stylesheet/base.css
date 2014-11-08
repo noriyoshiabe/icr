@@ -1,0 +1,89 @@
+body {
+  background-color #fff;
+  font-family: "ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN", "メイリオ", Meiryo, sans-serif;
+  color: #666;
+}
+
+h1, h2, h3, h4, h5, h6, p, a, div, form, input, button, label {
+  font-family: inherit;
+  color: inherit;
+}
+
+a {
+  text-decoration: none;
+}
+
+input, button {
+  padding:5px 15px;
+  background: #fff;
+  border: 1px solid #bcd;
+  border-radius: 5px;
+}
+
+label {
+  font-size: 14px;
+  margin-right: 10px;
+}
+
+.header {
+  position: absolute;
+  height: 40px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  border-bottom: 2px solid #bcd;
+  padding-top: 5px;
+  padding-left: 15px;
+  background-color: #f2f2f2;
+  color: #444;
+}
+
+h1 {
+  font-size: 30px;
+  font-weight: bold;
+  color: #000;
+  line-height: 70px;
+}
+
+h2 {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+h3 {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+h4 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.header__user-profile {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding-top: 5px;
+  padding-right: 10px;
+}
+
+.header__user-profile > * {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 5px;
+}
+
+.header__user-profile > p {
+  color: #000;
+  font-weight: bold;
+}
+
+.content {
+  position: absolute;
+  padding: 10px;
+  top: 40px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}

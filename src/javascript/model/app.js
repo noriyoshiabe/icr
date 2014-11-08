@@ -63,6 +63,9 @@
     _loadUser: function() {
       this.user = new User({id: this.cert.user_id})
       this.user.find(function(user) {
+        this.users.remove(user)
+        this.users.add(user)
+
         this._notify(App.READY)
 
         if (this.room_id) {

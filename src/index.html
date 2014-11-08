@@ -19,25 +19,40 @@
   <div class="content js-content">
     <template id="front">
       <div class="front">
-        <h4>Create Room</h4>
-        <form id="create-room">
-          <label for="name">Room Name</label>
-          <input name="name" type="text" required>
-          <input type="submit" value="Create">
-        </form>
+        <div class="front__copy">
+          <h1>No need to any sign up nor sign in.</h1>
+          <p><span>All you have to do</span></p>
+          <p>is just entering your false name and create the room that is infinitely anonymous.</p>
+          <p>Instant Chat Room doesn't care about any your personal information.</p>
+        </div>
 
-        <h4>Recents</h4>
-        <ul class="recent-room-list js-recent-room-list">
-          <template id="recent-room-list-item">
-            <li>
-              <button class="js-button"></button>
-            </li>
-          </template>
-        </ul>
+        <div class="front__menu">
+          <h4>Let's create your room.</h4>
+          <form id="create-room" class="create-room">
+            <label for="name">Room name</label>
+            <input name="name" type="text" required>
+            <input type="submit" value="Create" id="ssubmit">
+          </form>
 
-        <div class="js-development">
-          <h4>Development</h4>
-          <button class="js-clear-db">Clear DB</button>
+          <div class="js-recent-room">
+            <h4>Recently visited.</h4>
+            <ul class="js-recent-room-list">
+              <template id="recent-room-list-item">
+                <li>
+                  <button class="js-button"></button>
+                </li>
+              </template>
+            </ul>
+          </div>
+
+          <div class="development js-development">
+            <h4>Development</h4>
+            <ul>
+              <li>
+                <button class="js-clear-db">Clear DB</button>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </template>

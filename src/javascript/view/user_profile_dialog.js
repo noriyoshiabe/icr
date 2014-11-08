@@ -17,7 +17,7 @@
     this.cancel = this.userProfileForm.querySelector('input[type="button"]')
 
     this.name.value = app.user.name
-    this.image_url.value = app.user.image_url
+    this.image_url.value = app.user.image_url ? app.user.image_url : ''
 
     this.userProfileForm.addEventListener('submit', this._onSubmit.bind(this))
     this.cancel.addEventListener('click', this._onCancel.bind(this))

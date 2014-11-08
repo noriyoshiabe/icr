@@ -1,0 +1,58 @@
+.front {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+}
+
+.front__copy {
+  margin-top: 100px;
+  text-align: center;
+}
+
+.front__copy p span {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.front__copy p {
+  font-size: 20px;
+}
+
+.front__menu {
+  position: absolute;
+  margin-top: 100px;
+  width: 600px;
+  left: 50%;
+  margin-left: -300px;
+  margin-bottom: 30px;
+}
+
+.front__menu h4 {
+  border-bottom: 2px solid #bcd;
+  margin-top: 60px;
+}
+
+.front__menu > h4:first-child {
+  margin-top: 0;
+}
+
+.create-room {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.front__menu ul {
+  margin-top: 30px;
+}
+
+.front__menu li {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.front__menu li button {
+  width: 400px;
+}

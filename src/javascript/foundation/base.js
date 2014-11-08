@@ -188,6 +188,10 @@
       return this.models.length
     },
 
+    isEmpty: function() {
+      return 0 == this.size()
+    },
+
     get: function(index) {
       return this.models[index]
     },

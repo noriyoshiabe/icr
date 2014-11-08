@@ -16,6 +16,7 @@
     this.createRoomForm = this.el.querySelector('#create-room')
     this.createRoomForm.addEventListener('submit', this._onSubmitCreateRoom.bind(this))
 
+    this.recentRoom = this.el.querySelector('.js-recent-room')
     this.recentRoomList = this.el.querySelector('.js-recent-room-list')
     this.recentRoomListItems = []
 
@@ -23,6 +24,8 @@
     this.development.style.display = __DEBUG__ ? 'block' : 'none'
     this.clearDB = this.development.querySelector('.js-clear-db')
     this.clearDB.addEventListener('click', this._onClickClearDB.bind(this))
+
+    this.recentRoom.style.display = this.app.rooms.isEmpty() ? 'none' : 'block'
 
     this.app.rooms.each(function(room) {
       var listItem = new RecentRoomListItem(this.recentRoomList, room)
