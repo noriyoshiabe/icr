@@ -88,7 +88,7 @@
       this._changeState(App.STATE_ENTERING_ROOM)
 
       if (!this.user.name) {
-        this._notify(App.USERNAME_REQUIRED, room_id)
+        this._notify(App.USERNAME_REQUIRED, room_id, roomName)
         return
       }
 

@@ -38,10 +38,12 @@
       }
     },
 
-    _notify: function(event, data) {
+    _notify: function(event, va_args) {
+      Array.prototype.unshift.call(arguments, this)
+
       for (var i = 0; i < this._observers.length; ++i) {
         var elem = this._observers[i]
-        elem.func.bind(elem.observer)(this, event, data)
+        elem.func.apply(elem.observer, arguments)
       }
     }
   }

@@ -30,7 +30,7 @@
       this.currentView.addObserver(this, this._onNotifyViewEvent)
     },
 
-    _onNotifyAppEvent: function(app, event, data) {
+    _onNotifyAppEvent: function(app, event, data1, data2) {
       switch (event) {
         case App.READY:
           if (this.options.debug) {
@@ -41,7 +41,7 @@
           break
 
         case App.CHANGE_STATE:
-          var state = data
+          var state = data1
           switch (state) {
             case App.STATE_FRONT:
               this._switchView(new FrontView(this.content, app))
@@ -54,13 +54,14 @@
           break
 
         case App.USERNAME_REQUIRED:
-          var room_id = data
+          var room_id = data1
+          var roomName = data2
           var username = ''
           while (!username || !username.length) {
             username = prompt("Please enter your name.")
           }
           this.app.userProfile(username)
-          this.app.enterRoom(room_id)
+          this.app.enterRoom(room_id, roomName)
           break
       }
     },
