@@ -32,6 +32,7 @@
 
 .modal__content td {
   height: 50px;
+  vertical-align: middle;
 }
 
 .modal__content input[type=text] {
