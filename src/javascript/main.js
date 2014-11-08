@@ -18,8 +18,13 @@
 
   Controller.prototype = {
     start: function() {
-      this.app.start(location.hash.match(/^#.*/) ? location.hash.substring(1) : null)
-      window.addEventListener('popstate', this._onPopState.bind(this), false)
+      if (this._isSupportedBrowser()) {
+        this.app.start(location.hash.match(/^#.*/) ? location.hash.substring(1) : null)
+        window.addEventListener('popstate', this._onPopState.bind(this), false)
+      } else {
+        new UnsupportedHeaderView()
+        document.getElementById('unsupported-front').style.display = 'block'
+      }
     },
 
     _switchView: function(view) {
@@ -192,6 +197,11 @@
           this._dismissModal()
           break
       }
+    },
+
+    _isSupportedBrowser: function() {
+      var ua = window.navigator.userAgent.toLowerCase()
+      return -1 != ua.indexOf('chrome')
     }
   }
 

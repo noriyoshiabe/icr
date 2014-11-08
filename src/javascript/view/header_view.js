@@ -63,3 +63,15 @@
 
   return HeaderView
 });
+
+(function(definition) {
+  UnsupportedHeaderView = definition()
+})(function() {
+  'use strict'
+
+  return function UnsupportedHeaderView() {
+    this.el = document.querySelector('.js-header')
+    this.userProfile = this.el.querySelector('.js-user-profile')
+    this.userProfile.style.display = 'none'
+  }
+});

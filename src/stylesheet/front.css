@@ -55,3 +55,7 @@
 .front__menu li button {
   width: 400px;
 }
+
+#unsupported-front a {
+  text-decoration: underline;
+}
