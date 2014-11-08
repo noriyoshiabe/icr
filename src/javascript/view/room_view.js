@@ -103,11 +103,42 @@
       if (this.beforeScrollTopListItem && index < this.messageList.cache.indexOf(this.beforeScrollTopListItem)) {
         this.messagesContainer.scrollTop = this.messagesContainer.scrollTop + listItem.el.offsetHeight
       } else if (index == this.messageList.cache.length - 1) {
-        if (this.messagesContainer.scrollHeight - (this.messagesContainer.scrollTop + this.messagesContainer.offsetHeight) < this.messagesContainer.offsetHeight / 4) {
-          this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight
+        if (this._submitted) {
+          this.scrollToBottom()
+          this._submitted = false
+        }
+        else if (this.messagesContainer.scrollHeight - (this.messagesContainer.scrollTop + this.messagesContainer.offsetHeight) < this.messagesContainer.offsetHeight / 4) {
+          this.scrollToBottom()
         }
       }
       return listItem
+    },
+
+    scrollToBottom: function() {
+      _.defer(function() {
+        if (this._requestId) {
+          window.cancelAnimationFrame(this._requestId)
+        }
+
+        var duration = 750
+        var start = performance.now()
+        var from = this.messagesContainer.scrollTop
+        var distance = this.messagesContainer.scrollHeight - from
+
+        var step = function(timestamp) {
+          var delta = timestamp - start
+          var t = delta / duration
+          var progress = 1 - Math.pow(1 - t, 2)
+          this.messagesContainer.scrollTop = from + distance * progress
+          if (delta < duration) {
+            this._requestId = window.requestAnimationFrame(step)
+          } else {
+            this._requestId = null
+          }
+        }.bind(this)
+
+        this._requestId = window.requestAnimationFrame(step)
+      }.bind(this))
     },
 
     _removeListItem: function(context, model) {
@@ -176,6 +207,7 @@
         e.preventDefault()
         var input = e.target.form.elements["message"]
         if (0 < input.value.length) {
+          this._submitted = true
           this._notify(RoomView.SUBMIT_MESSAGE, input.value)
           input.value = ''
         }

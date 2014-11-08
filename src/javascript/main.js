@@ -82,6 +82,7 @@
 
             case App.STATE_ROOM_ENTERED:
               this._switchView(new RoomView(this.content, app))
+              this.currentView.scrollToBottom()
               document.title = (this.app.room.name ? this.app.room.name : this.app.room.id) + ' - ' + SITE_NAME
               break
           }
