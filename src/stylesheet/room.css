@@ -1,0 +1,115 @@
+.room {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+}
+
+.messages-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 250px;
+  bottom: 50px;
+  overflow-y: scroll;
+}
+
+.messages-container ul {
+  display: block;
+  word-wrap: break-word;
+}
+
+.message-form {
+  position: absolute;
+  height: 50px;
+  left: 0;
+  right: 250px;
+  bottom: 0;
+}
+
+.message-form input {
+  position: relative;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.side-menu {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 240px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
+.side-menu__room-name h2 {
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 24px;
+  color: #000;
+  text-overflow: ellipsis;
+  border-bottom: 2px solid #bcd;
+}
+
+.side-menu__room-name div {
+  width: 100%;
+  text-align: right;
+  padding-top: 5px;
+}
+
+.side-menu__members,
+.side-menu__rooms {
+  margin-top: 25px;
+}
+
+.side-menu__members li,
+.side-menu__rooms li {
+  margin-top: 10px;
+}
+
+.side-menu__members p {
+  display: inline-block;
+  margin-left: 5px;
+  max-width: 205px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.side-menu__rooms button {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.message {
+  margin-top: 15px;
+}
+
+.message:first-child {
+  margin-top: 0;
+}
+
+.message__username {
+  display: inline-block;
+  margin-left: 5px;
+  color: #577a9f;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.message__date {
+  display: inline-block;
+  margin-left: 5px;
+  font-size: 8px;
+  color: #888;
+}
+
+.message__body {
+  word-wrap: normal;
+  font-size: 14px;
+  color: #000;
+}
