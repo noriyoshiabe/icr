@@ -35,6 +35,11 @@
     },
 
     _showModal: function(modal) {
+      this.headerView.setFromEnable(false)
+      if (this.currentView) {
+        this.currentView.setFromEnable(false)
+      }
+
       if (this.currentModal) {
         this._dismissModal()
       }
@@ -44,6 +49,11 @@
     },
 
     _dismissModal: function() {
+      this.headerView.setFromEnable(true)
+      if (this.currentView) {
+        this.currentView.setFromEnable(true)
+      }
+
       this.documentBody.removeChild(this.currentModal.el)
       this.currentModal.removeObserver(this)
       this.currentModal = null

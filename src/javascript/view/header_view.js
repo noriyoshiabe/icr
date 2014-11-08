@@ -51,6 +51,13 @@
 
     _onClickSettings: function(e) {
       this._notify(HeaderView.CLICK_SETTINGS)
+    },
+
+    setFromEnable: function(enable) {
+      var elems = this.el.querySelectorAll('input, button')
+      _.each(elems, function(el) {
+        el.disabled = !enable
+      })
     }
   })
 

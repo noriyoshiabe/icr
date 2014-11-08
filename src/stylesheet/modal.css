@@ -1,0 +1,71 @@
+.modal {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,32,64,.2)
+}
+
+.modal__content {
+  position: absolute;
+  width: 500px;
+  left: 50%;
+  top: 50%;
+  margin-left: -250px;
+  background-color: #fff;
+  border: 2px solid #bcd;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.modal__content form {
+  text-align: center;
+}
+
+.modal__content table {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 30px;
+}
+
+.modal__content td {
+  height: 50px;
+}
+
+.modal__content input[type=text] {
+  width: 300px;
+}
+
+.modal__content input[type=submit] {
+  margin-top: 10px;
+  width: 150px;
+}
+
+.modal__content input[type=button] {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  top: -10px;
+  right: -10px;
+  border: 2px solid #bcd;
+  border-radius: 20px;
+  padding: 0;
+  text-align: center;
+}
+
+.modal__content.user-name {
+  height: 200px;
+  margin-top: -100px;
+}
+
+.modal__content.room-name {
+  height: 200px;
+  margin-top: -100px;
+}
+
+.modal__content.user-profile {
+  height: 260px;
+  margin-top: -130px;
+}

@@ -58,6 +58,13 @@
       this._notify(event, data)
     },
 
+    setFromEnable: function(enable) {
+      var elems = this.el.querySelectorAll('input, button')
+      _.each(elems, function(el) {
+        el.disabled = !enable
+      })
+    },
+
     destroy: function() {
     }
   })

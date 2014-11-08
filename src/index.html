@@ -7,7 +7,7 @@
 </head>
 <body>
   <header class="header js-header">
-    <a href="/" class="header__logo js-logo">
+    <a href="/" tabindex="-1" class="header__logo js-logo">
       <h2>INSTANT CHAT ROOM</h2>
     </a>
     <div class="header__user-profile js-user-profile">
@@ -31,7 +31,7 @@
           <form id="create-room" class="create-room">
             <label for="name">Room name</label>
             <input name="name" type="text" required>
-            <input type="submit" value="Create" id="ssubmit">
+            <input type="submit" value="Create">
           </form>
 
           <div class="js-recent-room">
@@ -112,38 +112,68 @@
   <template id="modal">
     <div class="modal">
       <template id="user-name-dialog">
-        <div class="modal__content">
-          <form id="user-name-form" class="user-name-form">
-            <p>Please enter your name.</p>
-            <label for="name">Name</label>
-            <input name="name" type="text" required>
+        <div class="modal__content user-name">
+          <h4>Please enter your name.</h4>
+          <form id="user-name-form">
+            <table>
+              <tr>
+                <td>
+                  <label for="name">Name</label>
+                </td>
+                <td>
+                  <input name="name" type="text" required>
+                </td>
+              </tr>
+            </table>
             <input type="submit" value="OK">
           </form>
         </div>
       </template>
 
       <template id="room-name-dialog">
-        <div class="modal__content">
-          <form id="room-name-form" class="room-name-form">
-            <p>Please enter room name.</p>
-            <label for="name">Name</label>
-            <input name="name" type="text" required>
-            <input type="button" value="Cancel">
+        <div class="modal__content room-name">
+          <h4>Please enter room name.</h4>
+          <form id="room-name-form">
+            <table>
+              <tr>
+                <td>
+                  <label for="name">Name</label>
+                </td>
+                <td>
+                  <input name="name" type="text" required>
+                </td>
+              </tr>
+            </table>
             <input type="submit" value="OK">
+            <input type="button" value="×">
           </form>
         </div>
       </template>
 
       <template id="user-profile-dialog">
-        <div class="modal__content">
-          <form id="user-profile-form" class="user-profile-form">
-            <h4>User Profile Settings</h4>
-            <label for="name">Name</label>
-            <input name="name" type="text" required>
-            <label for="image_url">Image URL</label>
-            <input name="image_url" type="text">
-            <input type="button" value="Cancel">
+        <div class="modal__content user-profile">
+          <h4>User Profile Settings</h4>
+          <form id="user-profile-form">
+            <table>
+              <tr>
+                <td>
+                  <label for="name">Name</label>
+                </td>
+                <td>
+                  <input name="name" type="text" required>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <label for="image_url">Image URL</label>
+                </td>
+                <td>
+                  <input name="image_url" type="text">
+                </td>
+              </tr>
+            </table>
             <input type="submit" value="OK">
+            <input type="button" value="×">
           </form>
         </div>
       </template>

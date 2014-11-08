@@ -58,6 +58,7 @@ h3 {
 h4 {
   font-size: 16px;
   font-weight: 600;
+  border-bottom: 2px solid #bcd;
 }
 
 .header__user-profile {
