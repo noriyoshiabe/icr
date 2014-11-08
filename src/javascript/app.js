@@ -37,6 +37,7 @@
     _onNotifyDBEvent: function(db, event) {
       if (DB.OPENED == event) {
         this.db = db
+        this.rooms = new Rooms
         this._readCertificate()
       }
     },
@@ -48,13 +49,6 @@
         cert.secret = cert.secret || uuid.v4()
         cert.save()
 
-        this._loadRooms()
-      }.bind(this))
-    },
-
-    _loadRooms: function() {
-      this.rooms = new Rooms
-      this.rooms.select({index: "entered_at", last: RECENT_ROOMS}, function(rooms) {
         this._loadUsers()
       }.bind(this))
     },
@@ -75,7 +69,9 @@
           this.enterRoom(this.room_id)
           this.room_id = null
         } else {
-          this._changeState(App.STATE_FRONT)
+          this.rooms.select({index: "entered_at", last: RECENT_ROOMS}, function(rooms) {
+            this._changeState(App.STATE_FRONT)
+          }.bind(this))
         }
       }.bind(this))
     },
@@ -122,7 +118,11 @@
       this.room.removeObserver(this)
       this.room.leave()
       this.room = null
-      this._changeState(App.STATE_FRONT)
+
+      this.rooms.clear()
+      this.rooms.select({index: "entered_at", last: RECENT_ROOMS}, function(rooms) {
+        this._changeState(App.STATE_FRONT)
+      }.bind(this))
     },
 
     switchRoom: function(room_id) {
@@ -147,14 +147,11 @@
       switch (event) {
         case Room.ENTERED:
           this._changeState(App.STATE_ROOM_ENTERED)
-          this.rooms.remove(room)
-          this.rooms.add(room)
-          if (RECENT_ROOMS < this.rooms.size()) {
-            var willRemove = _.last(this.rooms.models, this.rooms.size() - RECENT_ROOMS)
-            _.each(willRemove, function(room) {
-              this.rooms.remove(room)
-            }.bind(this))
-          }
+
+          this.rooms.clear()
+          this.rooms.select({index: "entered_at", last: RECENT_ROOMS + 1}, function(rooms) {
+            this.rooms.remove(this.room)
+          }.bind(this))
           break
 
         case Room.USER_ADDED:

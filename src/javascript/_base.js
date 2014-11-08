@@ -93,8 +93,8 @@
       }.bind(this))
     },
 
-    save: function() {
-      this.getDB().save(this.storeName, this.attributes())
+    save: function(callback) {
+      this.getDB().save(this.storeName, this.attributes(), callback)
     }
   })
 
@@ -221,8 +221,8 @@
       return JSON.stringify(this.attributes())
     },
 
-    save: function() {
-      this.getDB().save(this.model.prototype.storeName, this.attributes())
+    save: function(callback) {
+      this.getDB().save(this.model.prototype.storeName, this.attributes(), callback)
     },
 
     select: function(query, callback) {
