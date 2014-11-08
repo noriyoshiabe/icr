@@ -66,6 +66,15 @@ h4 {
   clear: left;
 }
 
+.header__logo p {
+  display: inline-block;
+  margin-top: 5px;
+  margin-left: 5px;
+  font-size: 10px;
+  -webkit-transform: scale3d(0.6, 0.6, 1);
+  -webkit-transform-origin: 0 0;
+}
+
 .header__user-profile {
   position: absolute;
   top: 0;
