@@ -13,6 +13,7 @@
     <div class="header__user-profile js-user-profile">
       <img class="js-avatar" width="20" height="20">
       <p class="js-name"></p>
+      <button class="js-settings">Settings</button>
     </div>
   </header>
   <div class="content js-content">
@@ -21,7 +22,7 @@
         <h4>Create Room</h4>
         <form id="create-room">
           <label for="name">Room Name</label>
-          <input name="name" type="text">
+          <input name="name" type="text" required>
           <input type="submit" value="Create">
         </form>
 
@@ -92,5 +93,23 @@
       </div>
     </template>
   </div>
+
+  <template id="modal">
+    <div class="modal">
+      <template id="user-profile-dialog">
+        <div class="modal__content">
+          <form id="user-profile-form" class="user-profile-form">
+            <label for="name">Name</label>
+            <input name="name" type="text" required>
+            <label for="image_url">Image URL</label>
+            <input name="image_url" type="text">
+            <input type="button" value="Cancel">
+            <input type="submit" value="OK">
+          </form>
+        </div>
+      </template>
+    </div>
+  </template>
+
 </body>
 </html>

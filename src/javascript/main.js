@@ -9,6 +9,9 @@
     this.content = document.querySelector('.js-content')
     this.currentView = null
 
+    this.documentBody = document.querySelector('body')
+    this.currentModal = null
+
     this.app = new App()
     this.app.addObserver(this, this._onNotifyAppEvent)
   }
@@ -28,6 +31,21 @@
       this.content.appendChild(view.el)
       this.currentView = view
       this.currentView.addObserver(this, this._onNotifyViewEvent)
+    },
+
+    _showModal: function(modal) {
+      if (this.currentModal) {
+        this._dismissModal()
+      }
+      this.currentModal = modal
+      this.currentModal.addObserver(this, this._onNotifyViewEvent)
+      this.documentBody.appendChild(modal.el)
+    },
+
+    _dismissModal: function() {
+      this.documentBody.removeChild(this.currentModal.el)
+      this.currentModal.removeObserver(this)
+      this.currentModal = null
     },
 
     _onNotifyAppEvent: function(app, event, data1, data2) {
@@ -69,7 +87,7 @@
       }
     },
 
-    _onNotifyViewEvent: function(view, event, data) {
+    _onNotifyViewEvent: function(view, event, data1, data2) {
       switch (event) {
         case HeaderView.CLICK_LOGO:
           if (App.STATE_ROOM_ENTERED == this.app.state) {
@@ -77,13 +95,17 @@
           }
           break
 
+        case HeaderView.CLICK_SETTINGS:
+          this._showModal(new UserProfileDialog(this.app))
+          break
+
         case FrontView.SUBMIT_CREATE_ROOM:
-          var roomName = data
+          var roomName = data1
           this.app.enterRoom(null, roomName)
           break
 
         case FrontView.CLICK_RECENT_ROOM:
-          var room = data
+          var room = data1
           this.app.enterRoom(room.id)
           break
 
@@ -92,7 +114,7 @@
           break
 
         case RoomView.SUBMIT_MESSAGE:
-          var message = data
+          var message = data1
           this.app.room.sendMessage(message)
           break
 
@@ -105,8 +127,19 @@
           break
 
         case RoomView.CLICK_ROOM:
-          var room = data
+          var room = data1
           this.app.switchRoom(room.id)
+          break
+
+        case Modal.CANCEL:
+          this._dismissModal()
+          break
+
+        case UserProfileDialog.SUBMIT:
+          var name = data1
+          var image_url = data2
+          this.app.userProfile(name, image_url)
+          this._dismissModal()
           break
       }
     }

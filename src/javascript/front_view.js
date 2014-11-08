@@ -40,9 +40,7 @@
     _onSubmitCreateRoom: function(e) {
       e.preventDefault()
       var roomName = e.target.elements["name"].value
-      if (0 < roomName.length) {
-        this._notify(FrontView.SUBMIT_CREATE_ROOM, roomName)
-      }
+      this._notify(FrontView.SUBMIT_CREATE_ROOM, roomName)
     },
 
     _onClickRecentRoom: function(e) {
