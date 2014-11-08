@@ -51,7 +51,10 @@ module.exports = function (grunt) {
         files: {
           'public/application.js': [
             'lib/**/*.js',
-            'src/**/*.js'
+            'src/javascript/foundation/*.js',
+            'src/javascript/model/*.js',
+            'src/javascript/view/*.js',
+            'src/javascript/*.js'
           ]
         }
       },
