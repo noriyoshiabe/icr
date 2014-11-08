@@ -36,6 +36,9 @@
       view: RoomListItem
     }
 
+    this.messagesContainer = this.el.querySelector('.js-messages-container')
+    this.messagesContainer.addEventListener('scroll', this._onScrollMessagesContainer.bind(this), false)
+
     this.messageForm = this.el.querySelector('#message-form')
     this.messageFormText = this.messageForm.querySelector('input[name="message"]')
     this.messageFormText.addEventListener('keypress', this._onKeyPressMessageFormText.bind(this), false)
@@ -88,6 +91,21 @@
       return listItem
     },
 
+    _onScrollMessagesContainer: function(e) {
+      if (0 == e.target.scrollTop) {
+        this.beforeScrollTopListItem = this.messageList.cache[0]
+        this.room.loadPrev()
+      }
+    },
+
+    _renderMessageListItem: function(context, index, model, options) {
+      var listItem = this._renderListItem(context, index, model, options)
+      if (this.beforeScrollTopListItem && index < this.messageList.cache.indexOf(this.beforeScrollTopListItem)) {
+        this.messagesContainer.scrollTop = this.messagesContainer.scrollTop + listItem.el.offsetHeight
+      }
+      return listItem
+    },
+
     _removeListItem: function(context, model) {
       var listItem = _.findWhere(context.cache, {id: model.id})
       var index = context.cache.indexOf(listItem)
@@ -100,7 +118,7 @@
     _onNotifyMessagesEvent: function(messages, event, message) {
       switch (event) {
         case Collection.ADDED:
-          this._renderListItem(this.messageList, messages.indexOf(message), message, this.users)
+          this._renderMessageListItem(this.messageList, messages.indexOf(message), message, this.users)
           break
       }
     },
