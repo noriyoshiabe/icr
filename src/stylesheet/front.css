@@ -22,7 +22,7 @@
 }
 
 .front__menu {
-  position: absolute;
+  position: relative;
   margin-top: 100px;
   width: 600px;
   left: 50%;
@@ -54,6 +54,16 @@
 
 .front__menu li button {
   width: 400px;
+}
+
+.front__copyright {
+  margin-top: 100px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.front__copyright p {
+  font-size: 10px;
 }
 
 #unsupported-front a {
