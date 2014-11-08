@@ -85,4 +85,11 @@ module.exports = function (grunt) {
     'copy',
     'concat'
   ])
+
+  grunt.registerTask('build', [
+    'clean',
+    'bower',
+    'copy',
+    'concat'
+  ])
 };
