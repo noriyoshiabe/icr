@@ -17,11 +17,14 @@
   App.READY = 'app:ready'
   App.CHANGE_STATE = 'app:change_state'
   App.USERNAME_REQUIRED = 'app:username_required'
+  App.ROOM_NAME_CHANGED = 'app:room_name_changed'
 
   var RECENT_ROOMS = 5
 
   _.extend(App.prototype, Observable.prototype, {
-    start: function() {
+    start: function(room_id) {
+      this.room_id = room_id
+
       var db = new DB('icr', 1)
       db.addSchemeDefinition(User)
       db.addSchemeDefinition(Room)
@@ -68,8 +71,9 @@
       this.user.find(function(user) {
         this._notify(App.READY)
 
-        if (location.hash.match(/^#.*/)) {
-          this.enterRoom(location.hash.substring(1))
+        if (this.room_id) {
+          this.enterRoom(this.room_id)
+          this.room_id = null
         } else {
           this._changeState(App.STATE_FRONT)
         }
@@ -92,7 +96,10 @@
         return
       }
 
-      room_id = room_id || uuid.v4()
+      if (!room_id) {
+        console.warn('enterRoom() room_id is not set.')
+        room_id = uuid.v4()
+      }
 
       this.room = new Room({id: room_id}, this.cert)
       this.room.find(function(room) {
@@ -103,7 +110,6 @@
 
         this.room.addObserver(this, this._onNotifyRoomEvent)
         this.room.enter(this.user)
-        history.pushState('', document.title, '#' + room_id)
       }.bind(this))
     },
 
@@ -117,8 +123,6 @@
       this.room.leave()
       this.room = null
       this._changeState(App.STATE_FRONT)
-
-      history.pushState('', document.title, '/')
     },
 
     switchRoom: function(room_id) {
@@ -131,8 +135,6 @@
       this.room.leave()
       this._changeState(App.STATE_FRONT)
       this.enterRoom(room_id)
-
-      history.pushState('', document.title, '#' + room_id)
     },
 
     clearDB: function() {
@@ -159,6 +161,12 @@
           var user = data
           this.users.remove(user)
           this.users.add(user)
+          break
+
+        case Model.CHANGED:
+          if (App.STATE_ROOM_ENTERED == this.state) {
+            this._notify(App.ROOM_NAME_CHANGED, this.room.name)
+          }
           break
       }
     },

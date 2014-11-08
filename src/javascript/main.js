@@ -3,6 +3,8 @@
 })(function() {
   'use strict'
 
+  var SITE_NAME = 'INSTANT CHAT ROOM'
+
   var Controller = function Controller() {
     this.content = document.querySelector('.js-content')
     this.currentView = null
@@ -16,7 +18,8 @@
 
   Controller.prototype = {
     start: function() {
-      this.app.start()
+      this.app.start(location.hash.match(/^#.*/) ? location.hash.substring(1) : null)
+      window.addEventListener('popstate', this._onPopState.bind(this), false)
     },
 
     _switchView: function(view) {
@@ -64,10 +67,12 @@
           switch (state) {
             case App.STATE_FRONT:
               this._switchView(new FrontView(this.content, app))
+              document.title = SITE_NAME
               break
 
             case App.STATE_ROOM_ENTERED:
               this._switchView(new RoomView(this.content, app))
+              document.title = (this.app.room.name ? this.app.room.name : this.app.room.id) + ' - ' + SITE_NAME
               break
           }
           break
@@ -77,6 +82,31 @@
           var roomName = data2
           this._showModal(new UserNameDialog({id: room_id, name: roomName}))
           break
+
+        case App.ROOM_NAME_CHANGED:
+          var roomName = data1
+          document.title = roomName + ' - ' + SITE_NAME
+          break
+      }
+    },
+
+    _onPopState: function(e) {
+      if (location.hash.match(/^#.*/)) {
+        var room_id = location.hash.substring(1)
+        switch (this.app.state) {
+          case App.STATE_FRONT:
+            this.app.enterRoom(room_id)
+            break
+          case App.STATE_ROOM_ENTERED:
+            this.app.switchRoom(room_id)
+            break
+        }
+      } else {
+        switch (this.app.state) {
+          case App.STATE_ROOM_ENTERED:
+            this.app.leaveRoom()
+            break
+        }
       }
     },
 
@@ -85,6 +115,7 @@
         case HeaderView.CLICK_LOGO:
           if (App.STATE_ROOM_ENTERED == this.app.state) {
             this.app.leaveRoom()
+            history.pushState({}, document.title, '/')
           }
           break
 
@@ -94,12 +125,15 @@
 
         case FrontView.SUBMIT_CREATE_ROOM:
           var roomName = data1
-          this.app.enterRoom(null, roomName)
+          var room_id = uuid.v4()
+          this.app.enterRoom(room_id, roomName)
+          history.pushState({}, document.title, '#' + room_id)
           break
 
         case FrontView.CLICK_RECENT_ROOM:
           var room = data1
           this.app.enterRoom(room.id)
+          history.pushState({}, document.title, '#' + room.id)
           break
 
         case FrontView.CLICK_CLEAR_DB:
@@ -118,6 +152,7 @@
         case RoomView.CLICK_ROOM:
           var room = data1
           this.app.switchRoom(room.id)
+          history.pushState({}, document.title, '#' + room.id)
           break
 
         case Modal.CANCEL:
@@ -129,6 +164,7 @@
           var roomInfo = data2
           this.app.userProfile(username)
           this.app.enterRoom(roomInfo.id, roomInfo.name)
+          history.pushState({}, document.title, '#' + roomInfo.id)
           this._dismissModal()
           break
 
