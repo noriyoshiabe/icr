@@ -102,6 +102,10 @@
       var listItem = this._renderListItem(context, index, model, options)
       if (this.beforeScrollTopListItem && index < this.messageList.cache.indexOf(this.beforeScrollTopListItem)) {
         this.messagesContainer.scrollTop = this.messagesContainer.scrollTop + listItem.el.offsetHeight
+      } else if (index == this.messageList.cache.length - 1) {
+        if (this.messagesContainer.scrollHeight - (this.messagesContainer.scrollTop + this.messagesContainer.offsetHeight) < this.messagesContainer.offsetHeight / 4) {
+          this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight
+        }
       }
       return listItem
     },
