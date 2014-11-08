@@ -5,7 +5,7 @@
 
   var template = null
 
-  var FrontView = function FrontView(container, app, debug) {
+  var FrontView = function FrontView(container, app) {
     Observable.apply(this)
 
     template = template || container.querySelector('#front')
@@ -20,7 +20,7 @@
     this.recentRoomListItems = []
 
     this.development = this.el.querySelector('.js-development')
-    this.development.style.display = debug ? 'block' : 'none'
+    this.development.style.display = __DEBUG__ ? 'block' : 'none'
     this.clearDB = this.development.querySelector('.js-clear-db')
     this.clearDB.addEventListener('click', this._onClickClearDB.bind(this))
 

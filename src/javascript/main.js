@@ -3,9 +3,7 @@
 })(function() {
   'use strict'
 
-  var Controller = function Controller(options) {
-    this.options = options || {}
-
+  var Controller = function Controller() {
     this.content = document.querySelector('.js-content')
     this.currentView = null
 
@@ -51,7 +49,7 @@
     _onNotifyAppEvent: function(app, event, data1, data2) {
       switch (event) {
         case App.READY:
-          if (this.options.debug) {
+          if (__DEBUG__) {
             window.db = DB.instance
             window.app = this.app
             window.controller = this
@@ -65,7 +63,7 @@
           var state = data1
           switch (state) {
             case App.STATE_FRONT:
-              this._switchView(new FrontView(this.content, app, this.options.debug))
+              this._switchView(new FrontView(this.content, app))
               break
 
             case App.STATE_ROOM_ENTERED:
