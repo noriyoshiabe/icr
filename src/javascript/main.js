@@ -38,13 +38,16 @@
             window.app = this.app
             window.controller = this
           }
+
+          this.headerView = new HeaderView(this.app)
+          this.headerView.addObserver(this, this._onNotifyViewEvent)
           break
 
         case App.CHANGE_STATE:
           var state = data1
           switch (state) {
             case App.STATE_FRONT:
-              this._switchView(new FrontView(this.content, app))
+              this._switchView(new FrontView(this.content, app, this.options.debug))
               break
 
             case App.STATE_ROOM_ENTERED:
@@ -68,6 +71,12 @@
 
     _onNotifyViewEvent: function(view, event, data) {
       switch (event) {
+        case HeaderView.CLICK_LOGO:
+          if (App.STATE_ROOM_ENTERED == this.app.state) {
+            this.app.leaveRoom()
+          }
+          break
+
         case FrontView.SUBMIT_CREATE_ROOM:
           var roomName = data
           this.app.enterRoom(null, roomName)

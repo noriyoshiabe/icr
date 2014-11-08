@@ -6,13 +6,13 @@
   <link rel="stylesheet" href="application.css">
 </head>
 <body>
-  <header class="header">
-    <a class="header__logo">
+  <header class="header js-header">
+    <a href="/" class="header__logo js-logo">
       <h2>INSTANT CHAT ROOM</h2>
     </a>
-    <div class="header__user js-header-user">
-      <img class="js-avatar" src="/images/default.png" width="20" height="20">
-      <p class="js-name">anonymous</p>
+    <div class="header__user-profile js-user-profile">
+      <img class="js-avatar" width="20" height="20">
+      <p class="js-name"></p>
     </div>
   </header>
   <div class="content js-content">
@@ -34,8 +34,10 @@
           </template>
         </ul>
 
-        <h4>Development</h4>
-        <button class="js-clear-db">Clear DB</button>
+        <div class="js-development">
+          <h4>Development</h4>
+          <button class="js-clear-db">Clear DB</button>
+        </div>
       </div>
     </template>
 
@@ -69,8 +71,8 @@
             <ul class="js-member-list">
               <template id="member-list-item">
                 <li>
-                  <img class="js-avatar" src="/images/default.png" alt="anonymous" width="20" height="20">
-                  <p class="js-username">anonymous</p>
+                  <img class="js-avatar" width="20" height="20">
+                  <p class="js-username"></p>
                 </li>
               </template>
             </ul>
