@@ -96,9 +96,21 @@
 
   <template id="modal">
     <div class="modal">
+      <template id="user-name-dialog">
+        <div class="modal__content">
+          <form id="user-name-form" class="user-name-form">
+            <p>Please enter your name.</p>
+            <label for="name">Name</label>
+            <input name="name" type="text" required>
+            <input type="submit" value="OK">
+          </form>
+        </div>
+      </template>
+
       <template id="user-profile-dialog">
         <div class="modal__content">
           <form id="user-profile-form" class="user-profile-form">
+            <h4>User Profile Settings</h4>
             <label for="name">Name</label>
             <input name="name" type="text" required>
             <label for="image_url">Image URL</label>

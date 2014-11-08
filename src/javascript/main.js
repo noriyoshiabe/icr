@@ -75,12 +75,7 @@
         case App.USERNAME_REQUIRED:
           var room_id = data1
           var roomName = data2
-          var username = ''
-          while (!username || !username.length) {
-            username = prompt("Please enter your name.")
-          }
-          this.app.userProfile(username)
-          this.app.enterRoom(room_id, roomName)
+          this._showModal(new UserNameDialog({id: room_id, name: roomName}))
           break
       }
     },
@@ -130,6 +125,14 @@
           break
 
         case Modal.CANCEL:
+          this._dismissModal()
+          break
+
+        case UserNameDialog.SUBMIT:
+          var username = data1
+          var roomInfo = data2
+          this.app.userProfile(username)
+          this.app.enterRoom(roomInfo.id, roomInfo.name)
           this._dismissModal()
           break
 
