@@ -44,6 +44,7 @@
     this.messageFormText = this.messageForm.querySelector('textarea[name="message"]')
     this.messageFormText.rows = 1
     this.messageFormText.addEventListener('keydown', this._onKeyDownMessageFormText.bind(this), false)
+    this.messageFormText.addEventListener('input', this._onInputMessageFormText.bind(this), false)
 
     this.roomName = this.el.querySelector('.js-room-name')
     this.roomNameChange = this.el.querySelector('.js-room-name-change')
@@ -205,32 +206,21 @@
     },
 
     _onKeyDownMessageFormText: function(e) {
-      switch (e.keyCode) {
-        case 13:
-          if (e.altKey) {
-            if (MAX_FORM_ROW_COUNT > this.messageFormText.rows) {
-              this.messageFormText.rows += 1
-            }
-          } else {
-            e.preventDefault()
-            var textarea = e.target.form.elements["message"]
-            if (0 < textarea.value.length) {
-              this._submitted = true
-              this._notify(RoomView.SUBMIT_MESSAGE, textarea.value)
-              textarea.value = ''
-              textarea.rows = 1
-            }
-          }
-
-          break
-
-        case 8:
-          _.defer(function() {
-            var rowCount = e.target.value.split('\n').length
-            e.target.rows = MAX_FORM_ROW_COUNT > rowCount ? rowCount : MAX_FORM_ROW_COUNT
-          })
-          break
+      if (13 == e.keyCode && !e.altKey) {
+        e.preventDefault()
+        var textarea = e.target.form.elements["message"]
+        if (0 < textarea.value.length) {
+          this._submitted = true
+          this._notify(RoomView.SUBMIT_MESSAGE, textarea.value)
+          textarea.value = ''
+          textarea.rows = 1
+        }
       }
+    },
+
+    _onInputMessageFormText: function(e) {
+      var rowCount = e.target.value.split('\n').length
+      e.target.rows = MAX_FORM_ROW_COUNT > rowCount ? rowCount : MAX_FORM_ROW_COUNT
     },
 
     _onClickRoomNameChange: function(e) {
