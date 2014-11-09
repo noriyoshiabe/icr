@@ -138,3 +138,7 @@
 .markdown-body ul ul ul {
   list-style-type: square;
 }
+
+.markdown-body p {
+  white-space: pre-line;
+}
