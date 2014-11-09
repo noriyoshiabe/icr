@@ -120,6 +120,15 @@
   color: #000;
 }
 
+.markdown-body h4 {
+  border-style: none;
+}
+
+.markdown-body table {
+  table-layout: auto;
+  width: auto;
+}
+
 .markdown-body ul {
   list-style-type: disc;
 }
