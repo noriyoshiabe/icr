@@ -43,16 +43,6 @@ module.exports = function (grunt) {
             dest: 'public/'
           }
         ]
-      },
-      vendor: {
-        files: [
-          {
-            expand: true,
-            cwd: 'vendor/',
-            src: '**/*.{js,css}',
-            dest: 'public/'
-          }
-        ]
       }
     },
 
@@ -61,6 +51,7 @@ module.exports = function (grunt) {
         files: {
           'public/application.js': [
             'lib/**/*.js',
+            'vendor/**/*.js',
             'src/javascript/foundation/*.js',
             'src/javascript/model/*.js',
             'src/javascript/view/*.js',
@@ -72,7 +63,8 @@ module.exports = function (grunt) {
         files: {
           'public/application.css': [
             'lib/**/*.css',
-            'src/**/*.css'
+            'src/**/*.css',
+            'vendor/highlight.js/github.css'
           ]
         }
       }
