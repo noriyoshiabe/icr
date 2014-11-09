@@ -51,6 +51,7 @@ module.exports = function (grunt) {
         files: {
           'public/application.js': [
             'lib/**/*.js',
+            'vendor/**/*.js',
             'src/javascript/foundation/*.js',
             'src/javascript/model/*.js',
             'src/javascript/view/*.js',
@@ -62,7 +63,8 @@ module.exports = function (grunt) {
         files: {
           'public/application.css': [
             'lib/**/*.css',
-            'src/**/*.css'
+            'src/**/*.css',
+            'vendor/highlight.js/github.css'
           ]
         }
       }

@@ -285,6 +285,10 @@
       var date = new Date(this.message.created_at)
       this.date.textContent = date.getFullYear() + '/' + date.getMonth() + '/' + date.getDate() + ' ' + date.toLocaleTimeString()
       this.body.innerHTML = marked(this.message.message)
+      var preCodes = this.body.querySelectorAll('pre code')
+      _.each(preCodes, function(preCode) {
+        hljs.highlightBlock(preCode)
+      })
     },
 
     _onNotifyUserEvent: function(user, event) {
