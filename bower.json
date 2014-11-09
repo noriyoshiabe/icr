@@ -6,7 +6,8 @@
     "node-uuid": "~1.4.1",
     "crypto-js": "http://crypto-js.googlecode.com/files/CryptoJS%20v3.1.2.zip",
     "HTML5-Reset": "~2.1.2",
-    "marked": "~0.3.2"
+    "marked": "~0.3.2",
+    "github-markdown-css": "~1.2.0"
   },
   "exportsOverride": {
     "node-uuid": {

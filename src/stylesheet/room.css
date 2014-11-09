@@ -115,8 +115,26 @@
 }
 
 .message__body * {
-  white-space: pre-line;
   word-wrap: break-word;
   font-size: 14px;
   color: #000;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  list-style-type: disc;
+}
+
+.markdown-body ol ul,
+.markdown-body ul ol,
+.markdown-body ul ul,
+.markdown-body ol ol {
+  list-style-type: circle;
+}
+
+.markdown-body ol ol ul,
+.markdown-body ol ul ul,
+.markdown-body ul ol ul,
+.markdown-body ul ul ul {
+  list-style-type: square;
 }
