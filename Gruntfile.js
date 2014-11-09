@@ -51,7 +51,7 @@ module.exports = function (grunt) {
         files: {
           'public/application.js': [
             'lib/**/*.js',
-            'vendor/**/*.js',
+            'vendor/highlight.js/highlight.pack.js',
             'src/javascript/foundation/*.js',
             'src/javascript/model/*.js',
             'src/javascript/view/*.js',
