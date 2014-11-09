@@ -232,7 +232,7 @@
     },
 
     setFromEnable: function(enable) {
-      var elems = this.el.querySelectorAll('input, button')
+      var elems = this.el.querySelectorAll('input, button, textarea')
       _.each(elems, function(el) {
         el.disabled = !enable
       })
