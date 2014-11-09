@@ -4,6 +4,7 @@
   'use strict'
 
   var template = null
+  var MAX_FORM_ROW_COUNT = 10
 
   var RoomView = function RoomView(container, app) {
     Observable.apply(this)
@@ -40,8 +41,9 @@
     this.messagesContainer.addEventListener('scroll', this._onScrollMessagesContainer.bind(this), false)
 
     this.messageForm = this.el.querySelector('#message-form')
-    this.messageFormText = this.messageForm.querySelector('input[name="message"]')
-    this.messageFormText.addEventListener('keypress', this._onKeyPressMessageFormText.bind(this), false)
+    this.messageFormText = this.messageForm.querySelector('textarea[name="message"]')
+    this.messageFormText.rows = 1
+    this.messageFormText.addEventListener('keydown', this._onKeyDownMessageFormText.bind(this), false)
 
     this.roomName = this.el.querySelector('.js-room-name')
     this.roomNameChange = this.el.querySelector('.js-room-name-change')
@@ -202,15 +204,32 @@
       }
     },
 
-    _onKeyPressMessageFormText: function(e) {
-      if (e.keyCode == 13) {
-        e.preventDefault()
-        var input = e.target.form.elements["message"]
-        if (0 < input.value.length) {
-          this._submitted = true
-          this._notify(RoomView.SUBMIT_MESSAGE, input.value)
-          input.value = ''
-        }
+    _onKeyDownMessageFormText: function(e) {
+      switch (e.keyCode) {
+        case 13:
+          if (e.altKey) {
+            if (MAX_FORM_ROW_COUNT > this.messageFormText.rows) {
+              this.messageFormText.rows += 1
+            }
+          } else {
+            e.preventDefault()
+            var textarea = e.target.form.elements["message"]
+            if (0 < textarea.value.length) {
+              this._submitted = true
+              this._notify(RoomView.SUBMIT_MESSAGE, textarea.value)
+              textarea.value = ''
+              textarea.rows = 1
+            }
+          }
+
+          break
+
+        case 8:
+          _.defer(function() {
+            var rowCount = e.target.value.split('\n').length
+            e.target.rows = MAX_FORM_ROW_COUNT > rowCount ? rowCount : MAX_FORM_ROW_COUNT
+          })
+          break
       }
     },
 
@@ -275,7 +294,7 @@
       this.username.textContent = this.user ? this.user.name : 'Unknown'
       var date = new Date(this.message.created_at)
       this.date.textContent = date.getFullYear() + '/' + date.getMonth() + '/' + date.getDate() + ' ' + date.toLocaleTimeString()
-      this.body.textContent = this.message.message
+      this.body.innerHTML = marked(this.message.message)
     },
 
     _onNotifyUserEvent: function(user, event) {

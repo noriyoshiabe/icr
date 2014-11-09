@@ -11,7 +11,7 @@
   top: 0;
   left: 0;
   right: 275px;
-  bottom: 50px;
+  bottom: 47px;
   overflow-y: scroll;
 }
 
@@ -28,9 +28,11 @@
   bottom: 0;
 }
 
-.message-form input {
-  position: relative;
-  margin-top: 10px;
+.message-form textarea {
+  resize: none;
+  position: absolute;
+  bottom: 0px;
+  margin-bottom: 1px;
   width: 100%;
 }
 
@@ -109,8 +111,12 @@
 }
 
 .message__body {
+  overflow: hidden;
+}
+
+.message__body * {
   white-space: pre-line;
-  word-wrap: normal;
+  word-wrap: break-word;
   font-size: 14px;
   color: #000;
 }

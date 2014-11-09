@@ -13,7 +13,7 @@ a {
   text-decoration: none;
 }
 
-input, button {
+input, button, textarea {
   padding:5px 15px;
   background: #fff;
   border: 1px solid #bcd;
