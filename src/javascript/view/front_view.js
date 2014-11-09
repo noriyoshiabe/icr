@@ -33,6 +33,13 @@
       this.recentRoomList.appendChild(listItem.el)
       this.recentRoomListItems.push(listItem)
     }.bind(this))
+
+    this.releaseNotes = this.el.querySelector('.js-release-notes-list')
+
+    _.each(window.RELEASE_NOTES, function(release) {
+      var listItem = new ReleaseNotesListItem(this.releaseNotes, release)
+      this.releaseNotes.appendChild(listItem.el)
+    }.bind(this))
   }
 
   FrontView.SUBMIT_CREATE_ROOM = 'front_view:submit_create_room'
@@ -98,4 +105,34 @@
   })
 
   return RecentRoomListItem
+});
+
+(function(definition) {
+  ReleaseNotesListItem = definition()
+})(function() {
+  'use strict'
+
+  var template = null
+  var changedTemplate = null
+
+  var ReleaseNotesListItem = function ReleaseNotesListItem(container, release) {
+    template = template || container.querySelector('#release-notes-list-item')
+
+    this.el = document.importNode(template.content, true).firstElementChild
+    changedTemplate = changedTemplate || this.el.querySelector('#release-notes-changes-list-item')
+
+    this.version = this.el.querySelector('.js-version')
+    this.version.textContent = 'Version ' + release.version
+    this.date = this.el.querySelector('.js-date')
+    this.date.textContent = release.date
+    
+    this.changes = this.el.querySelector('.js-changes')
+    _.each(release.changes, function(change) {
+      var changeElem = document.importNode(changedTemplate.content, true).firstElementChild
+      changeElem.textContent = change
+      this.changes.appendChild(changeElem)
+    }.bind(this))
+  }
+
+  return ReleaseNotesListItem
 });

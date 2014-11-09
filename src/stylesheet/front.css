@@ -31,7 +31,7 @@
 }
 
 .front__menu h4 {
-  margin-top: 60px;
+  margin-top: 100px;
 }
 
 .front__menu > h4:first-child {
@@ -54,6 +54,41 @@
 
 .front__menu li button {
   width: 400px;
+}
+
+.release-notes-list {
+  list-style-type: none;
+}
+
+.release-notes-list div {
+  text-align: left;
+}
+
+.release-notes-list h5 {
+  font-size: 14px;
+  color: #444;
+  font-weight: bold;
+  margin-left: 100px;
+  float: left;
+  clear: left;
+}
+
+.release-notes-list p {
+  display: inline-block;
+  font-size: 10px;
+  margin-left: 10px;
+  padding-top: 5px;
+}
+
+.release-notes-list ul {
+  list-style-type: circle;
+  margin-top: 0;
+  margin-left: 130px;
+}
+.release-notes-list ul li {
+  text-align: left;
+  font-size: 12px;
+  margin-top: 5px;
 }
 
 .front__copyright {
