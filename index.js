@@ -1,8 +1,13 @@
 var express = require('express')
+var basicAuth = require('basic-auth-connect')
 
 var app = express()
 
 app.set('port', process.env.PORT || 3000)
+
+if (process.env.BASIC_AUTH_USER && process.env.BASIC_AUTH_PASS) {
+  app.use(basicAuth(process.env.BASIC_AUTH_USER, process.env.BASIC_AUTH_PASS))
+}
 
 app.use(express.static(__dirname + '/public'))
 app.use(function(req, res, next) {
