@@ -45,6 +45,19 @@
         var elem = this._observers[i]
         elem.func.apply(elem.observer, arguments)
       }
+
+      if (__DEBUG__) {
+        this._logDebug(arguments)
+      }
+    },
+
+    _logDebug: function(va_args) {
+      var sender = va_args[0]
+      var event = va_args[1]
+      var data1 = va_args[2]
+      var data2 = va_args[3]
+
+      console.log("%o %o %o %o", sender, event, data1, data2)
     }
   }
 
