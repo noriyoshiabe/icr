@@ -105,6 +105,7 @@
     _idlePing: function() {
       if (5 < this._idleCount) {
         this.disconnect()
+        this._notify(SignalingServer.ON_DISCONNECTED)
       } else {
         this.send(null, {type: 'ping'})
         this._notify(SignalingServer.IDLE_COMMUNICATION, this._idleCount, IDLE_COMMUNICATION_INTERVAL)

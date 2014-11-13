@@ -87,6 +87,60 @@
   text-overflow: ellipsis;
 }
 
+.notification {
+  position: absolute;
+  text-align: center;
+  z-index: 1;
+  top: 25px;
+  left: 50%;
+  width: 500px;
+  height: 40px;
+  margin-left: -250px;
+  padding-top: 8px;
+  border-radius: 8px;
+  pointer-events: none;
+  opacity: 0;
+  -webkit-animation-timing-function: ease;
+  -webkit-animation-fill-mode: both;
+}
+
+.notification.is-offline {
+  background-color: rgba(128,0,16,.4);
+  -webkit-animation-duration: 1s;
+  -webkit-animation-name: 'fade-in';
+}
+
+.notification.is-connecting {
+  background-color: rgba(128,128,0,.4);
+  -webkit-animation-duration: 1s;
+  -webkit-animation-name: 'fade-in';
+}
+
+.notification.is-online {
+  background-color: rgba(0,64,128,.4);
+  -webkit-animation-duration: 3s;
+  -webkit-animation-name: 'fade-in-out';
+}
+
+@-webkit-keyframes 'fade-in' {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@-webkit-keyframes 'fade-in-out' {
+  0%   { opacity: 0; }
+  33%  { opacity: 1; }
+  66%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.notification p {
+  display: inline-block;
+  text-align: center;
+  color: #fff;
+  font-weight: bold;
+}
+
 .message {
   margin-top: 15px;
 }

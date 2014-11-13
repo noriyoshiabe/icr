@@ -4,6 +4,8 @@
   'use strict'
 
   var LIMIT = 50
+  var RECCONECT_WAIT = 5000
+  var CONNECT_WAIT = 2000
 
   var Room = function Room(attributes, cert) {
     Model.apply(this, arguments)
@@ -15,6 +17,11 @@
 
   Room.USER_ADDED = 'room:user_added'
   Room.ENTERED = 'room:entered'
+  Room.CHANGE_STATE = 'app:change_state'
+
+  Room.STATE_OFFLINE = 'room:state_offline'
+  Room.STATE_CONNECTING = 'room:state_connecting'
+  Room.STATE_ONLINE = 'room:state_online'
 
   _.extend(Room.prototype, Model.prototype, {
     properties: ['id', 'name', 'named_at', 'entered_at'],
@@ -23,6 +30,8 @@
       this.user = user
       this.user.addObserver(this, this._onNotifyUserEvent)
       this.users.add(this.user)
+
+      this.state = Room.STATE_OFFLINE
 
       this._readMessage()
     },
@@ -48,6 +57,7 @@
       this.srv = new SignalingServer(location.origin.replace(/^http/, 'ws'))
       this.srv.addObserver(this, this._onNotifySignalingServerEvent)
       this.srv.connect(this.id)
+      this._changeState(Room.STATE_CONNECTING)
     },
 
     _finishEnter: function() {
@@ -87,10 +97,20 @@
     _onNotifySignalingServerEvent: function(srv, event, data) {
       switch (event) {
         case SignalingServer.ON_CONNECTED:
+          this._changeState(Room.STATE_ONLINE)
+          this.disconnected = false
           this._finishEnter()
           break
 
         case SignalingServer.ON_DISCONNECTED:
+          this.disconnected = true
+          this._changeState(Room.STATE_OFFLINE)
+          setTimeout(function() {
+            this._changeState(Room.STATE_CONNECTING)
+            setTimeout(function() {
+              this.srv.connect(this.id)
+            }.bind(this), CONNECT_WAIT)
+          }.bind(this), RECCONECT_WAIT)
           break
 
         case SignalingServer.ON_CREATE_PEER:
@@ -244,6 +264,11 @@
           }
           break
       }
+    },
+
+    _changeState: function(state) {
+      this.state = state
+      this._notify(Room.CHANGE_STATE, state)
     },
 
     storeName: "rooms"

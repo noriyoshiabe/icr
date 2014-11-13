@@ -3,12 +3,16 @@
 })(function() {
   'use strict'
 
-  var template = null
   var MAX_FORM_ROW_COUNT = 10
+
+  var documentBody = null
+  var template = null
+  var templateNotificaiton = null
 
   var RoomView = function RoomView(container, app) {
     Observable.apply(this)
 
+    documentBody = documentBody || document.querySelector('body')
     template = template || container.querySelector('#room')
 
     this.room = app.room
@@ -18,6 +22,7 @@
     this.rooms = app.rooms
 
     this.el = document.importNode(template.content, true).firstElementChild
+    templateNotificaiton = templateNotificaiton || this.el.querySelector('#notification')
 
     this.messageList = {
       container: this.el.querySelector('.js-message-list'),
@@ -161,9 +166,30 @@
       }
     },
 
-    _onNotifyCurrentRoomEvent: function(user, event) {
-      if (Model.CHANGED == event) {
-        this._renderRoomName()
+    _onNotifyCurrentRoomEvent: function(room, event, data) {
+      switch (event) {
+        case Model.CHANGED:
+          this._renderRoomName()
+          break
+
+        case Room.CHANGE_STATE:
+          if (room.disconnected) {
+            var state = data
+            switch (state) {
+              case Room.STATE_OFFLINE:
+                this._showNotification("You are currently offline.", "is-offline")
+                break
+
+              case Room.STATE_CONNECTING:
+                this._showNotification("Connecting...", "is-connecting")
+                break
+
+              case Room.STATE_ONLINE:
+                this._showNotification("You are now online. Yeah!!", "is-online")
+                break
+            }
+          }
+          break
       }
     },
 
@@ -229,6 +255,20 @@
 
     _onNotifyRoomListItemEvent: function(listItem, event, data) {
       this._notify(event, data)
+    },
+
+    _showNotification: function(message, className) {
+      if (documentBody.notification) {
+        documentBody.removeChild(documentBody.notification)
+      }
+      
+      documentBody.notification = document.importNode(templateNotificaiton.content, true).firstElementChild
+      documentBody.notification.notificationText = documentBody.notification.querySelector('p')
+      documentBody.appendChild(documentBody.notification)
+
+      documentBody.notification.classList.remove("is-offline", "is-connecting", "is-online")
+      documentBody.notification.classList.add(className)
+      documentBody.notification.notificationText.textContent = message
     },
 
     setFromEnable: function(enable) {
