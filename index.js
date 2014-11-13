@@ -46,13 +46,12 @@ Client.prototype = {
 }
 
 wsServer.on('connection', function(socket) {
-  console.log('Connection started.')
+  var fd = socket._socket._handle.fd
+  console.log('Connection started. fd=' + fd)
 
   var client = null
 
   socket.on('message', function(data) {
-    console.log('Message received:' + data)
-
     var message
 
     try {
@@ -62,13 +61,23 @@ wsServer.on('connection', function(socket) {
       return
     }
 
-    if (message.type == 'enter' && message.room_id && message.from) {
-      if (client) {
-        client.removeFromRoom()
-      }
+    switch (message.type) {
+      case 'enter':
+        if (message.room_id && message.from) {
+          console.log('Received enter: room=' + message.room_id + ' from=' + message.from)
 
-      client = new Client(socket, message.from, message.room_id)
-      client.addToRoom(rooms)
+          if (client) {
+            client.removeFromRoom()
+          }
+
+          client = new Client(socket, message.from, message.room_id)
+          client.addToRoom(rooms)
+        }
+        break
+
+      case 'ping':
+        socket.send(JSON.stringify({type: 'pong'}))
+        break
     }
 
     if (client) {
@@ -89,7 +98,7 @@ wsServer.on('connection', function(socket) {
   })
 
   socket.on('close', function() {
-    console.log('Connection closed.')
+    console.log('Connection closed. fd=' + fd)
 
     if (client) {
       client.removeFromRoom()
