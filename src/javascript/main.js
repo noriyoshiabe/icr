@@ -86,9 +86,11 @@
               break
 
             case App.STATE_ROOM_ENTERED:
-              this._switchView(new RoomView(this.content, app))
-              this.currentView.scrollToBottom()
-              document.title = (this.app.room.name ? this.app.room.name : this.app.room.id) + ' - ' + SITE_NAME
+              if (!(this.currentView instanceof RoomView)) {
+                this._switchView(new RoomView(this.content, app))
+                this.currentView.scrollToBottom()
+                document.title = (this.app.room.name ? this.app.room.name : this.app.room.id) + ' - ' + SITE_NAME
+              }
               break
           }
           break

@@ -5,14 +5,12 @@
 
   var MAX_FORM_ROW_COUNT = 10
 
-  var documentBody = null
   var template = null
   var templateNotificaiton = null
 
   var RoomView = function RoomView(container, app) {
     Observable.apply(this)
 
-    documentBody = documentBody || document.querySelector('body')
     template = template || container.querySelector('#room')
 
     this.room = app.room
@@ -258,17 +256,17 @@
     },
 
     _showNotification: function(message, className) {
-      if (documentBody.notification) {
-        documentBody.removeChild(documentBody.notification)
+      if (this.notification) {
+        this.el.removeChild(this.notification)
       }
       
-      documentBody.notification = document.importNode(templateNotificaiton.content, true).firstElementChild
-      documentBody.notification.notificationText = documentBody.notification.querySelector('p')
-      documentBody.appendChild(documentBody.notification)
+      this.notification = document.importNode(templateNotificaiton.content, true).firstElementChild
+      this.notificationText = this.notification.querySelector('p')
+      this.el.appendChild(this.notification)
 
-      documentBody.notification.classList.remove("is-offline", "is-connecting", "is-online")
-      documentBody.notification.classList.add(className)
-      documentBody.notification.notificationText.textContent = message
+      this.notification.classList.remove("is-offline", "is-connecting", "is-online")
+      this.notification.classList.add(className)
+      this.notificationText.textContent = message
     },
 
     setFromEnable: function(enable) {
