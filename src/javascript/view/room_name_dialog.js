@@ -5,7 +5,7 @@
 
   var template = null
 
-  var RoomNameDialog = function RoomNameDialog() {
+  var RoomNameDialog = function RoomNameDialog(room) {
     Modal.apply(this)
 
     template = template || this.el.querySelector('#room-name-dialog')
@@ -17,6 +17,8 @@
 
     this.roomNameForm.addEventListener('submit', this._onSubmit.bind(this))
     this.cancel.addEventListener('click', this._onCancel.bind(this))
+
+    this.name.value = room.name
 
     this.el.appendChild(this.modalContent)
   }

@@ -164,7 +164,7 @@
           break
 
         case RoomView.CLICK_ROOM_NAME_CHANGE:
-          this._showModal(new RoomNameDialog())
+          this._showModal(new RoomNameDialog(this.app.room))
           break
 
         case RoomView.CLICK_ROOM:
