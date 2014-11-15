@@ -1,5 +1,15 @@
 window.RELEASE_NOTES = [
   {
+    version: '0.3.0',
+    date: 'November 15, 2014',
+    changes: [
+      'Offline detection and reconnecting',
+      'Message editing',
+      'Message deleting',
+      'Some minor bug fixes'
+    ]
+  },
+  {
     version: '0.2.1',
     date: 'November 10, 2014',
     changes: [
