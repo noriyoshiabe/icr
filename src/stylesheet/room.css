@@ -157,11 +157,20 @@
   font-weight: bold;
 }
 
-.message__date {
+.message__date,
+.message__edit-date {
   display: inline-block;
   margin-left: 5px;
   font-size: 8px;
   color: #888;
+}
+
+.message__edit {
+  display: inline-block;
+  margin-left: 10px;
+  font-size: 8px;
+  padding-top: 3px;
+  padding-bottom: 3px;
 }
 
 .message__body {
@@ -172,6 +181,12 @@
   word-wrap: break-word;
   font-size: 14px;
   color: #000;
+}
+
+.message__edit-form {
+  resize: none;
+  width: 100%;
+  font-size: 14px;
 }
 
 .markdown-body h4 {

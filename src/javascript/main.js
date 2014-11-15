@@ -198,6 +198,12 @@
           this.app.userProfile(name, image_url)
           this._dismissModal()
           break
+
+        case MessageListItem.EDIT_MESSAGE:
+          var message = data1
+          var text = data2
+          this.app.room.updateMessage(message, text)
+          break
       }
     },
 

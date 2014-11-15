@@ -13,6 +13,7 @@
 
     template = template || container.querySelector('#room')
 
+    this.user = app.user
     this.room = app.room
     this.messages = app.room.messages
     this.users = app.users
@@ -62,7 +63,8 @@
     this._renderRoomName()
 
     this.messages.each(function(message) {
-      this._renderListItem(this.messageList, -1, message, this.users)
+      var listItem = this._renderListItem(this.messageList, -1, message, this.users, this.user)
+      listItem.addObserver(this, this._onNotifyMessageListItemEvent)
     }.bind(this))
 
     this.roomUsers.each(function(user) {
@@ -84,8 +86,8 @@
       this.roomName.textContent = this.room.name ? this.room.name : this.room.id
     },
 
-    _renderListItem: function(context, index, model, options) {
-      var listItem = new context.view(context.container, model, options)
+    _renderListItem: function(context, index, model, data1, data2) {
+      var listItem = new context.view(context.container, model, data1, data2)
       if (-1 == index) {
         context.container.appendChild(listItem.el)
         context.cache.push(listItem)
@@ -104,8 +106,8 @@
       }
     },
 
-    _renderMessageListItem: function(context, index, model, options) {
-      var listItem = this._renderListItem(context, index, model, options)
+    _renderMessageListItem: function(context, index, model, data1, data2) {
+      var listItem = this._renderListItem(context, index, model, data1, data2)
       if (this.beforeScrollTopListItem && index < this.messageList.cache.indexOf(this.beforeScrollTopListItem)) {
         this.messagesContainer.scrollTop = this.messagesContainer.scrollTop + listItem.el.offsetHeight
       } else if (index == this.messageList.cache.length - 1) {
@@ -159,7 +161,8 @@
     _onNotifyMessagesEvent: function(messages, event, message) {
       switch (event) {
         case Collection.ADDED:
-          this._renderMessageListItem(this.messageList, messages.indexOf(message), message, this.users)
+          var listItem = this._renderMessageListItem(this.messageList, messages.indexOf(message), message, this.users, this.user)
+          listItem.addObserver(this, this._onNotifyMessageListItemEvent)
           break
       }
     },
@@ -255,6 +258,10 @@
       this._notify(event, data)
     },
 
+    _onNotifyMessageListItemEvent: function(listItem, event, data1, data2) {
+      this._notify(event, data1, data2)
+    },
+
     _showNotification: function(message, className) {
       if (this.notification) {
         this.el.removeChild(this.notification)
@@ -293,35 +300,66 @@
 })(function() {
   'use strict'
 
+  var MAX_FORM_ROW_COUNT = 5
+
   var template = null
 
-  var MessageListItem = function MessageListItem(container, message, users) {
+  var MessageListItem = function MessageListItem(container, message, users, user) {
+    Observable.apply(this)
+
     template = template || container.querySelector('#message-list-item')
 
     this.id = message.id
 
     this.el = document.importNode(template.content, true).firstElementChild
+    this.messagesContainer = container.parentNode
     this.avatar = this.el.querySelector('.js-avatar')
     this.username = this.el.querySelector('.js-username')
     this.date = this.el.querySelector('.js-date')
+    this.edit_date = this.el.querySelector('.js-edit-date')
+    this.edit = this.el.querySelector('.js-edit')
     this.body = this.el.querySelector('.js-body')
+    this.edit_form = this.el.querySelector('.js-edit-form')
+
+    this.edit_form.style.display = 'none'
+    this.edit_date.style.display = 'none'
+
+    this.edit.addEventListener('click', this._onClickEdit.bind(this), false)
+    this.edit_form.addEventListener('blur', this._onBlurEditForm.bind(this), false)
+    this.edit_form.addEventListener('keydown', this._onKeyDownMessageFormText.bind(this), false)
+    this.edit_form.addEventListener('input', this._onInputMessageFormText.bind(this), false)
 
     this.message = message
-    this.user = users.byId(message.sender_id)
+    this.message.addObserver(this, this._onNotifyMessageEvent)
 
+    this.user = users.byId(message.sender_id)
     if (this.user) {
       this.user.addObserver(this, this._onNotifyUserEvent)
+    }
+
+    if (this.user != user) {
+      this.el.removeChild(this.edit)
+      this.el.removeChild(this.edit_form)
     }
 
     this._render()
   }
 
-  MessageListItem.prototype = {
+  MessageListItem.EDIT_MESSAGE = 'message_list_item:edit_message'
+
+  _.extend(MessageListItem.prototype, Observable.prototype, {
     _render: function() {
       this.avatar.src = this.user && this.user.image_url ? this.user.image_url : '/images/default.png'
       this.username.textContent = this.user ? this.user.name : 'Unknown'
+
       var date = new Date(this.message.created_at)
       this.date.textContent = date.getFullYear() + '/' + date.getMonth() + '/' + date.getDate() + ' ' + date.toLocaleTimeString()
+      if (this.message.updated_at) {
+        date = new Date(this.message.updated_at)
+        this.edit_date.style.display = 'inline-block'
+        this.edit_date.textContent = 'edited: ' + date.getFullYear() + '/' + date.getMonth() + '/' + date.getDate() + ' ' + date.toLocaleTimeString()
+      }
+
       this.body.innerHTML = marked(this.message.message)
       var preCodes = this.body.querySelectorAll('pre code')
       _.each(preCodes, function(preCode) {
@@ -329,10 +367,64 @@
       })
     },
 
+    _onNotifyMessageEvent: function(user, event) {
+      if (Model.CHANGED == event) {
+        this._render()
+      }
+    },
+
     _onNotifyUserEvent: function(user, event) {
       if (Model.CHANGED == event) {
         this._render()
       }
+    },
+
+    _onClickEdit: function(e) {
+      if ('none' == this.edit_form.style.display) {
+        this.body.style.display = 'none'
+        this.edit_form.style.display = 'block'
+        this.edit_form.value = this.message.message
+        this.edit_form.focus()
+
+        this._adjustRowCount()
+
+        if (this.edit_form.offsetHeight > this.messagesContainer.scrollHeight - this.edit_form.offsetTop - this.edit_form.offsetHeight) {
+          this.messagesContainer.scrollTop += this.edit_form.offsetHeight
+        }
+
+        this.edit.disabled = true
+      }
+    },
+
+    _onBlurEditForm: function(e) {
+      this.body.style.display = 'block'
+      this.edit_form.style.display = 'none'
+      this.edit.disabled = false
+
+      if (this.body.offsetHeight > this.messagesContainer.scrollHeight - this.body.offsetTop - this.body.offsetHeight) {
+        this.messagesContainer.scrollTop += this.body.offsetHeight
+      }
+    },
+
+    _adjustRowCount: function() {
+      var rowCount = this.edit_form.value.split('\n').length
+      this.edit_form.rows = MAX_FORM_ROW_COUNT > rowCount ? rowCount : MAX_FORM_ROW_COUNT
+    },
+
+    _onKeyDownMessageFormText: function(e) {
+      if (13 == e.keyCode && !e.altKey) {
+        e.preventDefault()
+        if (0 < this.edit_form.value.length) {
+          this._notify(MessageListItem.EDIT_MESSAGE, this.message, this.edit_form.value)
+          this.edit_form.blur()
+        }
+      } else if (27 == e.keyCode) {
+        this.edit_form.blur()
+      }
+    },
+
+    _onInputMessageFormText: function(e) {
+      this._adjustRowCount()
     },
 
     attachUser: function(user) {
@@ -347,7 +439,7 @@
         this.user.removeObserver(this)
       }
     }
-  }
+  })
 
   return MessageListItem
 });

@@ -14,18 +14,14 @@
       user.send('sync:query:room')
 
       var to = new Date().getTime()
-      var syncQuery = {to: to}
-      var query = {index: "room_id_and_created_at", upper: to}
 
-      var first = _.first(this.room.messages.models)
-      if (first) {
-        syncQuery.from = first.created_at
-        syncQuery.not_in_ids = this.room.messages.ids()
-        user.send('sync:query:message', syncQuery)
+      var syncQuery = null
+      if (this.room.messages.isEmpty()) {
+        user.send('sync:query:message', {not_in_ids: [], to: to, limit: this._limit})
       } else {
-        syncQuery.limit = this._limit
-        syncQuery.not_in_ids = []
-        user.send('sync:query:message', syncQuery)
+        var first = _.first(this.room.messages.models)
+        user.send('sync:query:message', {not_in_ids: this.room.messages.ids(), from: first.created_at, to: to})
+        user.send('sync:query:message:updates', {from: first.created_at, to: to})
       }
     },
 
@@ -35,6 +31,10 @@
 
     syncNotifyUser: function() {
       this._broadcast('sync:notify:user', _.omit(this.room.user.attributes(), 'signature'))
+    },
+
+    syncNotifyMessage: function(message) {
+      this._broadcast('sync:notify:message', message.attributes())
     },
 
     syncQueryMessages: function(messages, before) {
@@ -52,14 +52,7 @@
         case 'sync:query:message':
           var syncQuery = message.data
 
-          var query = {
-            index: "room_id_and_created_at",
-            lower: [this.room.id, syncQuery.from ? syncQuery.from : 0],
-            upper: [this.room.id, syncQuery.to],
-            last: syncQuery.limit ? syncQuery.limit : null
-          }
-
-          Messages.select(query, function(messages) {
+          Messages.select(this._buildQuery(syncQuery), function(messages) {
             var results = _.reject(messages.attributes(), function(attrs) {
               return _.contains(syncQuery.not_in_ids, attrs.id)
             })
@@ -74,6 +67,27 @@
           var messages = new Messages(unknownMessages)
           messages.save()
           this.room.messages.add(messages)
+          break
+
+        case 'sync:query:message:updates':
+          var syncQuery = message.data
+
+          Messages.select(this._buildQuery(syncQuery), function(messages) {
+            var results = _.filter(messages.attributes(), function(attrs) {
+              return !!attrs.updated_at
+            })
+            user.send('sync:result:message:updates', results)
+          })
+          break
+
+        case 'sync:result:message:updates':
+          _.each(message.data, function(message) {
+            this._updateMessage(message)
+          }.bind(this))
+          break
+
+        case 'sync:notify:message':
+          this._updateMessage(message.data)
           break
 
         case 'sync:query:user':
@@ -97,6 +111,25 @@
             this.room.save()
           }
           break
+      }
+    },
+
+    _buildQuery: function(syncQuery) {
+      return {
+        index: "room_id_and_created_at",
+        lower: [this.room.id, syncQuery.from ? syncQuery.from : 0],
+        upper: [this.room.id, syncQuery.to],
+        last: syncQuery.limit ? syncQuery.limit : null
+      }
+    },
+
+    _updateMessage: function(message) {
+      var mine = this.room.messages.byId(message.id)
+      if (mine) {
+        if (!mine.updated_at || mine.updated_at < message.updated_at) {
+          mine.set(message)
+          mine.save()
+        }
       }
     },
 
