@@ -17,6 +17,7 @@
   }
 
   Room.USER_ADDED = 'room:user_added'
+  Room.USER_CHANGED = 'room:user_changed'
   Room.ENTERED = 'room:entered'
   Room.CHANGE_STATE = 'app:change_state'
 
@@ -144,6 +145,10 @@
 
         case User.ON_DISCONNECTED:
           this.users.remove(user)
+          break
+
+        case Model.CHANGED:
+          this._notify(Room.USER_CHANGED, user)
           break
       }
     },

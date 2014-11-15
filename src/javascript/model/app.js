@@ -159,8 +159,15 @@
 
         case Room.USER_ADDED:
           var user = data
-          this.users.remove(user)
           this.users.add(user)
+          break
+
+        case Room.USER_CHANGED:
+          var roomUser = data
+          user = this.users.byId(roomUser.id)
+          if (user && user != roomUser) {
+            user.set(roomUser)
+          }
           break
 
         case Model.CHANGED:
