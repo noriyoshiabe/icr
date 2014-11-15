@@ -303,6 +303,7 @@
   var MAX_FORM_ROW_COUNT = 5
 
   var template = null
+  var templateDeleted = null
 
   var MessageListItem = function MessageListItem(container, message, users, user) {
     Observable.apply(this)
@@ -312,12 +313,15 @@
     this.id = message.id
 
     this.el = document.importNode(template.content, true).firstElementChild
+    templateDeleted = templateDeleted || container.querySelector('#message-list-item-deleted')
+
     this.messagesContainer = container.parentNode
     this.avatar = this.el.querySelector('.js-avatar')
     this.username = this.el.querySelector('.js-username')
     this.date = this.el.querySelector('.js-date')
     this.edit_date = this.el.querySelector('.js-edit-date')
     this.edit = this.el.querySelector('.js-edit')
+    this.delete = this.el.querySelector('.js-delete')
     this.body = this.el.querySelector('.js-body')
     this.edit_form = this.el.querySelector('.js-edit-form')
 
@@ -328,6 +332,8 @@
     this.edit_form.addEventListener('blur', this._onBlurEditForm.bind(this), false)
     this.edit_form.addEventListener('keydown', this._onKeyDownMessageFormText.bind(this), false)
     this.edit_form.addEventListener('input', this._onInputMessageFormText.bind(this), false)
+
+    this.delete.addEventListener('dblclick', this._onDblClickDelete.bind(this), false)
 
     this.message = message
     this.message.addObserver(this, this._onNotifyMessageEvent)
@@ -346,25 +352,33 @@
   }
 
   MessageListItem.EDIT_MESSAGE = 'message_list_item:edit_message'
+  MessageListItem.DELETE_MESSAGE = 'message_list_item:delete_message'
 
   _.extend(MessageListItem.prototype, Observable.prototype, {
     _render: function() {
-      this.avatar.src = this.user && this.user.image_url ? this.user.image_url : '/images/default.png'
-      this.username.textContent = this.user ? this.user.name : 'Unknown'
+      if (this.message.deleted_at) {
+        while (this.el.firstChild) {
+          this.el.removeChild(this.el.firstChild)
+        }
+        this.el.appendChild(document.importNode(templateDeleted.content, true).firstElementChild)
+      } else {
+        this.avatar.src = this.user && this.user.image_url ? this.user.image_url : '/images/default.png'
+        this.username.textContent = this.user ? this.user.name : 'Unknown'
 
-      var date = new Date(this.message.created_at)
-      this.date.textContent = date.getFullYear() + '/' + date.getMonth() + '/' + date.getDate() + ' ' + date.toLocaleTimeString()
-      if (this.message.updated_at) {
-        date = new Date(this.message.updated_at)
-        this.edit_date.style.display = 'inline-block'
-        this.edit_date.textContent = 'edited: ' + date.getFullYear() + '/' + date.getMonth() + '/' + date.getDate() + ' ' + date.toLocaleTimeString()
+        var date = new Date(this.message.created_at)
+        this.date.textContent = date.getFullYear() + '/' + date.getMonth() + '/' + date.getDate() + ' ' + date.toLocaleTimeString()
+        if (this.message.updated_at) {
+          date = new Date(this.message.updated_at)
+          this.edit_date.style.display = 'inline-block'
+          this.edit_date.textContent = 'edited: ' + date.getFullYear() + '/' + date.getMonth() + '/' + date.getDate() + ' ' + date.toLocaleTimeString()
+        }
+
+        this.body.innerHTML = marked(this.message.message)
+        var preCodes = this.body.querySelectorAll('pre code')
+        _.each(preCodes, function(preCode) {
+          hljs.highlightBlock(preCode)
+        })
       }
-
-      this.body.innerHTML = marked(this.message.message)
-      var preCodes = this.body.querySelectorAll('pre code')
-      _.each(preCodes, function(preCode) {
-        hljs.highlightBlock(preCode)
-      })
     },
 
     _onNotifyMessageEvent: function(user, event) {
@@ -394,6 +408,10 @@
 
         this.edit.disabled = true
       }
+    },
+
+    _onDblClickDelete: function(e) {
+      this._notify(MessageListItem.DELETE_MESSAGE, this.message)
     },
 
     _onBlurEditForm: function(e) {

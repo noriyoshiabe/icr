@@ -97,8 +97,12 @@
                 <p class="message__date js-date"></p>
                 <p class="message__edit-date js-edit-date"></p>
                 <button class="message__edit js-edit">Edit</button>
+                <button class="message__delete js-delete">Delete<span>Double Click!!</span></button>
                 <div class="message__body markdown-body js-body"></div>
                 <textarea class="message__edit-form js-edit-form" maxlength="" autocorrect="off" autocomplete="off" spellcheck="true"></textarea>
+                <template id="message-list-item-deleted">
+                  <p class="message__deleted">This message was deleted.</p>
+                </template>
               </li>
             </template>
           </ul>

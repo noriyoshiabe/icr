@@ -204,6 +204,11 @@
           var text = data2
           this.app.room.updateMessage(message, text)
           break
+
+        case MessageListItem.DELETE_MESSAGE:
+          var message = data1
+          this.app.room.deleteMessage(message)
+          break
       }
     },
 

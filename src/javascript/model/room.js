@@ -91,6 +91,12 @@
       this.synchronizer.syncNotifyMessage(message)
     },
 
+    deleteMessage: function(message) {
+      message.set({message: 'deleted', deleted_at: new Date().getTime()})
+      message.save()
+      this.synchronizer.syncNotifyMessage(message)
+    },
+
     _onNotifySignalingServerEvent: function(srv, event, data) {
       switch (event) {
         case SignalingServer.ON_CONNECTED:

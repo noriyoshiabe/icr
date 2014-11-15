@@ -74,7 +74,7 @@
 
           Messages.select(this._buildQuery(syncQuery), function(messages) {
             var results = _.filter(messages.attributes(), function(attrs) {
-              return !!attrs.updated_at
+              return !!attrs.updated_at || !!attrs.deleted_at
             })
             user.send('sync:result:message:updates', results)
           })
@@ -126,8 +126,12 @@
     _updateMessage: function(message) {
       var mine = this.room.messages.byId(message.id)
       if (mine) {
-        if (!mine.updated_at || mine.updated_at < message.updated_at) {
-          mine.set(message)
+        if (!!message.deleted_at) {
+          mine.set(_.pick(message, ['message', 'deleted_at']))
+          mine.save()
+        }
+        else if (!mine.updated_at || mine.updated_at < message.updated_at) {
+          mine.set(_.pick(message, ['message', 'updated_at']))
           mine.save()
         }
       }

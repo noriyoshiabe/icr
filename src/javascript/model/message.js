@@ -8,7 +8,7 @@
   }
 
   _.extend(Message.prototype, Model.prototype, {
-    properties: ['id', 'room_id', 'sender_id', 'message', 'created_at', 'updated_at'],
+    properties: ['id', 'room_id', 'sender_id', 'message', 'created_at', 'updated_at', 'deleted_at'],
 
     storeName: "messages"
   })

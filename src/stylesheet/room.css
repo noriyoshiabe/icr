@@ -165,12 +165,28 @@
   color: #888;
 }
 
-.message__edit {
+.message__edit,
+.message__delete {
   display: inline-block;
-  margin-left: 10px;
+  margin-left: 5px;
   font-size: 8px;
   padding-top: 3px;
   padding-bottom: 3px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.message__delete span {
+  display: none;
+}
+
+.message__delete:hover span {
+  display: inline;
+  margin-top: -10px;
+  position: absolute;
+  text-align: center;
+  z-index: 1;
+  pointer-events: none;
 }
 
 .message__body {
@@ -187,6 +203,12 @@
   resize: none;
   width: 100%;
   font-size: 14px;
+}
+
+.message__deleted {
+  font-size: 14px;
+  font-style: italic;
+  color: #ccc;
 }
 
 .markdown-body h4 {
