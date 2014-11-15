@@ -3,7 +3,7 @@
 })(function() {
   'use strict'
 
-  var LIMIT = 50
+  var PAGE_SIZE = 50
   var RECCONECT_WAIT = 5000
   var CONNECT_WAIT = 2000
 
@@ -13,6 +13,7 @@
     this.cert = cert
     this.users = new Users
     this.messages = new Messages
+    this.synchronizer = new Synchronizer(this, PAGE_SIZE)
   }
 
   Room.USER_ADDED = 'room:user_added'
@@ -39,15 +40,15 @@
     roomName: function(name) {
       this.set({name: name, named_at: new Date().getTime()})
       this.save()
-      this._broadcast('sync:notify:room', _.omit(this.attributes(), 'entered_at'))
+      this.synchronizer.syncNotifyRoom()
     },
 
     notifyUserUpdate: function() {
-      this._broadcast('sync:notify:user', _.omit(this.user.attributes(), 'signature'))
+      this.synchronizer.syncNotifyUser()
     },
 
     _readMessage: function() {
-      var query = {index: "room_id_and_created_at", lower: [this.id], upper:[this.id, ''], last: LIMIT}
+      var query = {index: "room_id_and_created_at", lower: [this.id], upper:[this.id, ''], last: PAGE_SIZE}
       this.messages.select(query, function(messages) {
         this._connectServer()
       }.bind(this))
@@ -80,17 +81,6 @@
       var data = Message.create(this.id, this.user.id, message)
       _.each(this.users.models, function(u) {
         u.send('message', data)
-      })
-    },
-
-    _broadcast: function(type, data) {
-      var message = JSON.stringify({type: type, data: data})
-      _.each(this.users.models, function(user) {
-        _.each(user.peers, function(peer) {
-          if (peer instanceof Peer) {
-            peer.send(message)
-          }
-        })
       })
     },
 
@@ -135,9 +125,7 @@
           }
 
           this._notify(Room.USER_ADDED, user)
-          this._syncUser(user)
-          this._syncRoom(user)
-          this._syncMessage(user)
+          this.synchronizer.syncQuery(user)
           break
 
         case User.AUTHENTICATE_FAILED:
@@ -151,37 +139,12 @@
           break
 
         case User.ON_MESSAGE:
-          this._onMessage(user, data)
+          this.synchronizer.onMessage(user, data)
           break
 
         case User.ON_DISCONNECTED:
           this.users.remove(user)
           break
-      }
-    },
-
-    _syncUser: function(user) {
-      user.send('sync:query:user')
-    },
-
-    _syncRoom: function(user) {
-      user.send('sync:query:room')
-    },
-
-    _syncMessage: function(user) {
-      var to = new Date().getTime()
-      var syncQuery = {to: to}
-      var query = {index: "room_id_and_created_at", upper: to}
-
-      var first = _.first(this.messages.models)
-      if (first) {
-        syncQuery.from = first.created_at
-        syncQuery.not_in_ids = this.messages.ids()
-        user.send('sync:query:message', syncQuery)
-      } else {
-        syncQuery.limit = LIMIT
-        syncQuery.not_in_ids = []
-        user.send('sync:query:message', syncQuery)
       }
     },
 
@@ -197,73 +160,13 @@
         index: "room_id_and_created_at",
         lower: [this.id, 0],
         upper: [this.id, before],
-        last: LIMIT
+        last: PAGE_SIZE
       }
 
       Messages.select(query, function(messages) {
         this.messages.add(messages)
-
-        var syncQuery = {
-          to: before,
-          not_in_ids: messages.ids(),
-          limit: LIMIT
-        }
-
-        this._broadcast('sync:query:message', syncQuery)
+        this.synchronizer.syncQueryMessages(messages, before)
       }.bind(this))
-    },
-
-    _onMessage: function(user, message) {
-      switch (message.type) {
-        case 'sync:query:message':
-          var syncQuery = message.data
-
-          var query = {
-            index: "room_id_and_created_at",
-            lower: [this.id, syncQuery.from ? syncQuery.from : 0],
-            upper: [this.id, syncQuery.to],
-            last: syncQuery.limit ? syncQuery.limit : null
-          }
-
-          Messages.select(query, function(messages) {
-            var results = _.reject(messages.attributes(), function(attrs) {
-              return _.contains(syncQuery.not_in_ids, attrs.id)
-            })
-            user.send('sync:result:message', results)
-          })
-          break
-
-        case 'sync:result:message':
-          var unknownMessages = _.filter(message.data, function(m) {
-            return !this.messages.contain(m)
-          }.bind(this))
-          var messages = new Messages(unknownMessages)
-          messages.save()
-          this.messages.add(messages)
-          break
-
-        case 'sync:query:user':
-          user.send('sync:result:user', _.omit(this.user.attributes(), 'signature'))
-          break
-
-        case 'sync:result:user':
-        case 'sync:notify:user':
-          user.set(message.data)
-          user.save()
-          break
-
-        case 'sync:query:room':
-          user.send('sync:result:room', _.omit(this.attributes(), 'entered_at'))
-          break
-
-        case 'sync:result:room':
-        case 'sync:notify:room':
-          if (!this.named_at || this.named_at < message.data.named_at) {
-            this.set(message.data)
-            this.save()
-          }
-          break
-      }
     },
 
     _changeState: function(state) {
