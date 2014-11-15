@@ -136,7 +136,6 @@
 
       this.room.removeObserver(this)
       this.room.leave()
-      this._changeState(App.STATE_FRONT)
       this.enterRoom(room_id)
     },
 
@@ -179,8 +178,9 @@
     },
 
     _changeState: function(state) {
+      var prevState = this.state
       this.state = state
-      this._notify(App.CHANGE_STATE, state)
+      this._notify(App.CHANGE_STATE, state, prevState)
     }
   })
 

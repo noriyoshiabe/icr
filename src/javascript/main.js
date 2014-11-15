@@ -79,6 +79,7 @@
 
         case App.CHANGE_STATE:
           var state = data1
+          var prevState = data2
           switch (state) {
             case App.STATE_FRONT:
               this._switchView(new FrontView(this.content, app))
@@ -86,7 +87,7 @@
               break
 
             case App.STATE_ROOM_ENTERED:
-              if (!(this.currentView instanceof RoomView)) {
+              if (App.STATE_ENTERING_ROOM == prevState) {
                 this._switchView(new RoomView(this.content, app))
                 this.currentView.scrollToBottom()
                 document.title = (this.app.room.name ? this.app.room.name : this.app.room.id) + ' - ' + SITE_NAME
