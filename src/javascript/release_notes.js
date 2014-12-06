@@ -1,5 +1,14 @@
 window.RELEASE_NOTES = [
   {
+    version: '0.3.1',
+    date: 'December 7, 2014',
+    changes: [
+      'Fix XSS vulnerability on message form',
+      'Room url guidance with room creation',
+      'Redirection http to https'
+    ]
+  },
+  {
     version: '0.3.0',
     date: 'November 15, 2014',
     changes: [
