@@ -373,7 +373,7 @@
           this.edit_date.textContent = 'edited: ' + date.getFullYear() + '/' + date.getMonth() + '/' + date.getDate() + ' ' + date.toLocaleTimeString()
         }
 
-        this.body.innerHTML = marked(this.message.message)
+        this.body.innerHTML = marked(this.message.message, {breaks: true, sanitize: true})
         var preCodes = this.body.querySelectorAll('pre code')
         _.each(preCodes, function(preCode) {
           hljs.highlightBlock(preCode)
