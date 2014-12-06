@@ -91,6 +91,10 @@
                 this._switchView(new RoomView(this.content, app))
                 this.currentView.scrollToBottom()
                 document.title = (this.app.room.name ? this.app.room.name : this.app.room.id) + ' - ' + SITE_NAME
+
+                if (this.app.room.created) {
+                  this._showModal(new RoomUrlDialog(this.app.room))
+                }
               }
               break
           }
@@ -144,8 +148,7 @@
 
         case FrontView.SUBMIT_CREATE_ROOM:
           var roomName = data1
-          var room_id = uuid.v4()
-          this.app.enterRoom(room_id, roomName)
+          var room_id = this.app.createRoom(roomName)
           history.pushState({}, document.title, '#' + room_id)
           break
 

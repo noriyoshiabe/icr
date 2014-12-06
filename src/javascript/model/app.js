@@ -87,6 +87,12 @@
       }
     },
 
+    createRoom: function(roomName) {
+      this.enterRoom(uuid.v4(), roomName)
+      this.room.created = true
+      return this.room.id
+    },
+
     enterRoom: function(room_id, roomName) {
       this._changeState(App.STATE_ENTERING_ROOM)
 
