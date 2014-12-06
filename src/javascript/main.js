@@ -114,6 +114,10 @@
     },
 
     _onPopState: function(e) {
+      if (this.currentModal) {
+        this._dismissModal()
+      }
+
       if (location.hash.match(/^#.*/)) {
         var room_id = location.hash.substring(1)
         switch (this.app.state) {
