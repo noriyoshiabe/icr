@@ -9,6 +9,14 @@ if (process.env.BASIC_AUTH_USER && process.env.BASIC_AUTH_PASS) {
   app.use(basicAuth(process.env.BASIC_AUTH_USER, process.env.BASIC_AUTH_PASS))
 }
 
+app.get('*', function(req,res,next) {
+  if (process.env.NODE_ENV === 'production' && req.headers['x-forwarded-proto'] !='https') {
+    res.redirect('https://' + req.headers.host + req.url)
+  } else {
+    next()
+  }
+})
+
 app.use(express.static(__dirname + '/public'))
 app.use(function(req, res, next) {
   res.status(404)
